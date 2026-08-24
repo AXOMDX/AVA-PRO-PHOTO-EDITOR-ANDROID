@@ -1,0 +1,8 @@
+{
+  "name":"Ava Pro Photo Editor",
+  "short_name":"Ava Pro",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#07080c",
+  "theme_color":"#7657ff"
+}

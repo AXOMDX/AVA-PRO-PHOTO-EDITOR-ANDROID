@@ -94,7 +94,7 @@
 
 </head> <body> <div class="app"> <header class="header"> <div class="brand"><div class="logo">✦</div>Ava <small style="color:#9b8bff;font-size:9px">PRO</small></div> <div class="headBtns"> <button class="icon" onclick="undo()">↶</button><button class="icon" onclick="redo()">↷</button> <button class="icon" onclick="toggleCompare()">◐</button><button class="icon" onclick="resetProject()">⟳</button> <button class="export" onclick="openExport()">Export</button> </div> </header>
 
-<main class="main"> <section class="workspace" id="workspace"> <div class="empty" id="empty"> <div class="emptyIcon">🖼️</div><h1>Ava <span>Pro</span></h1> <p>Professional Photo Editing • Creative Effects • AI Tools</p> <button class="primary" onclick="fileInput.click()">＋ Choose Photo</button> <div class="uploadHint">Drag & drop your image here, or click to upload</div> <div class="formats"><span>JPG</span><span>PNG</span><span>WEBP</span><span>High Quality</span></div> </div> <div class="stage" id="stage"> <div class="canvasWrap" id="canvasWrap"> <canvas id="canvas"></canvas> 
+<main class="main"> <section class="workspace" id="workspace"> <div class="empty" id="empty"> <div class="emptyIcon">🖼️</div><h1>Ava <span>Pro</span></h1> <p>Professional Photo Editing • Creative Effects • AI Tools</p> <button class="primary" onclick="openFilePicker()">＋ Choose Photo</button> <div class="uploadHint">Drag & drop your image here, or click to upload</div> <div class="formats"><span>JPG</span><span>PNG</span><span>WEBP</span><span>High Quality</span></div> </div> <div class="stage" id="stage"> <div class="canvasWrap" id="canvasWrap"> <canvas id="canvas"></canvas> 
 
 <div class="transformOverlay" id="transformOverlay">
 
@@ -176,7 +176,56 @@
 
 <div class="modal" id="exportModal"><div class="modalBox"> <h2>Export Ava Photo</h2> <div class="row"><div class="label">Format</div><select id="format" class="select"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></div> <div class="row"><div class="label">Quality <span id="qualityValue">92%</span></div><input id="quality" type="range" min="10" max="100" value="92"></div> <div class="modalActions"><button class="cancel" onclick="closeExport()">Cancel</button><button class="confirm" onclick="exportImage()">Save Photo</button></div> </div></div> <div class="toast" id="toast"></div>
 
-<script> const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'); const empty=document.getElementById('empty'),stage=document.getElementById('stage'),wrap=document.getElementById('canvasWrap'); const selection=document.getElementById('selection'),fileInput=document.getElementById('fileInput'),panel=document.getElementById('panel'); const workspace=document.getElementById('workspace'); let image=new Image(), originalSrc='', projectLoaded=false, selectedId=null, compareOriginal=false; let base={brightness:0,contrast:0,saturation:0,exposure:0,temperature:0,tint:0,highlights:0,shadows:0,whites:0,blacks:0,vibrance:0,clarity:0,sharpness:0,fade:0,grain:0,vignette:0}; let filter='none', rotation=0, flipX=1, flipY=1, frame='none', objects=[], history=[], future=[]; const toolNames=['adjust','color','filters','effects','retouch','crop','text','stickers','shapes','draw','overlay','frames','ai','collage','layers','social']; const presets=[ ['Original','none'],['Vivid','saturate(1.45) contrast(1.08)'],['Cinema','contrast(1.18) saturate(.88)'],['Warm','sepia(.18) saturate(1.18)'],['Cool','hue-rotate(12deg) saturate(.9)'],['B&W','grayscale(1) contrast(1.1)'],['Noir','grayscale(1) contrast(1.35) brightness(.9)'],['Vintage','sepia(.45) contrast(1.05)'],['Fade','contrast(.9) brightness(1.06) saturate(.8)'],['Drama','grayscale(.55) contrast(1.45)'],['Glow','brightness(1.08) saturate(1.15) contrast(1.05)'],['HDR','contrast(1.32) saturate(1.3)'],['Retro','sepia(.25) saturate(1.3) contrast(1.08)'],['Dream','brightness(1.12) contrast(.9) saturate(1.12) blur(.2px)'],['Film','contrast(1.12) saturate(.92) sepia(.08)'],['Pop','saturate(1.8) contrast(1.12)'],['Matte','contrast(.9) saturate(.75) brightness(1.04)'],['Night','brightness(.78) contrast(1.25) saturate(.85)'],['Golden','sepia(.3) saturate(1.45) brightness(1.05)'],['Frost','hue-rotate(18deg) saturate(.7) brightness(1.08)'] ]; const effectPresets=[ ['Bloom','brightness(1.08) saturate(1.15) blur(.35px)'],['Soft Focus','blur(1px) brightness(1.04) contrast(.94)'],['Neon','saturate(2) contrast(1.3)'],['Glitch','contrast(1.3) saturate(1.7)'],['VHS','contrast(.95) saturate(.85) sepia(.08)'],['Prism','hue-rotate(25deg) saturate(1.3)'],['Color Pop','saturate(2.1) contrast(1.08)'],['Dark Mood','brightness(.82) contrast(1.25) saturate(.9)'],['Sunset','sepia(.24) saturate(1.55) brightness(1.03)'],['Paper','grayscale(.18) contrast(.96) sepia(.15)'],['Halftone','contrast(1.35) saturate(.9)'],['Dream Glow','brightness(1.1) contrast(.88) saturate(1.18) blur(.55px)'] ]; const stickers={ Popular:['❤️','🔥','⭐','✨','😍','😂','😎','🎉','💯','👑'], Love:['💕','💖','💘','💋','🌹','🫶','💞','💓','🥰','💍'], Travel:['✈️','🌴','🏝️','🗺️','📍','🚗','🎒','⛺','🌊','🗿'], Food:['🍕','🍔','🍟','🍰','☕','🍓','🍩','🍜','🍦','🥤'], Nature:['🌸','🌻','🦋','🌈','🌿','🌙','☀️','🍃','🌺','🌲'], Social:['LIKE','FOLLOW','NEW','SALE','WOW','OMG','SUBSCRIBE','LOVE','VLOG','2026'], Decor:['✦','✧','★','☆','❀','❖','➜','♥','☁️','⚡'] }; function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(window._avaToast);window._avaToast=setTimeout(()=>el.classList.remove('show'),1600)} function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))} function openTool(name,button){ toolNames.forEach(n=>document.getElementById('tool-'+n)?.remove()); document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active')); if(button)button.classList.add('active'); const el=document.createElement('div');el.id='tool-'+name;panel.appendChild(el); renderTool(name,el); } function section(title,body){return `<div class="title">${title}</div>${body}`} function slider(id,label,min,max,val,step=1){return `<div class="row"><div class="label">${label}<span id="${id}Val">${val}</span></div><input id="${id}" type="range" min="${min}" max="${max}" value="${val}" step="${step}"></div>`} function bindSlider(id,key){const x=document.getElementById(id);if(!x)return;x.value=base[key]??0;x.oninput=()=>{base[key]=Number(x.value);document.getElementById(id+'Val').textContent=x.value;render()};x.onchange=commit} function commit(){history.push(snapshot());if(history.length>40)history.shift();future=[]} function snapshot(){return JSON.stringify({base,filter,rotation,flipX,flipY,frame,objects:objects.map(o=>({...o,visible:o.visible!==false,locked:!!o.locked,opacity:o.opacity??1,blend:o.blend||'source-over',flipX:o.flipX||1,flipY:o.flipY||1}))})} function restore(s){const p=JSON.parse(s);base=p.base;filter=p.filter;rotation=p.rotation;flipX=p.flipX;flipY=p.flipY;frame=p.frame;objects=p.objects;selectedId=null;render();refreshLayers()} function undo(){if(!history.length)return;future.push(snapshot());restore(history.pop())} function redo(){if(!future.length)return;history.push(snapshot());restore(future.pop())} function renderTool(name,el){ if(name==='adjust')el.innerHTML=section('Light & Detail', slider('brightness','Brightness',-100,100,0)+slider('contrast','Contrast',-100,100,0)+slider('exposure','Exposure',-100,100,0)+slider('highlights','Highlights',-100,100,0)+slider('shadows','Shadows',-100,100,0)+slider('whites','Whites',-100,100,0)+slider('blacks','Blacks',-100,100,0)+slider('clarity','Clarity',-100,100,0)+slider('sharpness','Sharpness',0,100,0)+slider('fade','Fade',0,100,0)+slider('grain','Grain',0,100,0)+slider('vignette','Vignette',0,100,0)+`<div class="grid2"><button class="btn" onclick="autoEnhance()">✨ Auto Enhance</button><button class="btn" onclick="resetAdjust()">Reset</button></div>`); ['brightness','contrast','exposure','highlights','shadows','whites','blacks','clarity','sharpness','fade','grain','vignette'].forEach(k=>bindSlider(k,k)); if(name==='color')el.innerHTML=section('Color Studio', slider('saturation','Saturation',-100,100,0)+slider('vibrance','Vibrance',-100,100,0)+slider('temperature','Temperature',-100,100,0)+slider('tint','Tint',-100,100,0)+`<div class="sub">HSL / Color Mix</div><div class="chips">${['Red','Orange','Yellow','Green','Cyan','Blue','Purple','Magenta'].map(x=>`<button class="chip" onclick="toast('${x} mixer ready')">${x}</button>`).join('')}</div><p style="color:var(--muted);font-size:11px;line-height:1.5;margin-top:10px">Advanced per-color masking is prepared for the next rendering-engine stage.</p>`); ['saturation','vibrance','temperature','tint'].forEach(k=>bindSlider(k,k)); if(name==='filters')el.innerHTML=section('Professional Presets',`<div class="chips">${['All','Cinematic','Film','Vintage','Portrait','B&W'].map((x,i)=>`<button class="chip ${i?'':'active'}">${x}</button>`).join('')}</div><div class="grid3" style="margin-top:10px">${presets.map((p,i)=>`<button class="preset" onclick="setFilter(${JSON.stringify(p[1])})"><div class="presetPreview" style="filter:${p[1]}"></div><span>${p[0]}</span></button>`).join('')}</div>`); if(name==='effects')el.innerHTML=section('Creative Effects',`<div class="chips">${['Light','Blur','Cinematic','Glitch','Texture','Dream'].map(x=>`<button class="chip">${x}</button>`).join('')}</div><div class="grid3" style="margin-top:10px">${effectPresets.map(p=>`<button class="preset" onclick="setFilter(${JSON.stringify(p[1])})"><div class="presetPreview" style="filter:${p[1]}"></div><span>${p[0]}</span></button>`).join('')}</div><div class="sub">Extra controls</div>${slider('effectIntensity','Intensity',0,100,100)}`); if(name==='retouch')el.innerHTML=section('Retouch',`<div class="grid2">${['Healing','Clone','Blemish','Whiten','Smooth','Sharpen','Dodge','Burn','Red Eye','Object Remove'].map(x=>`<button class="btn" onclick="toast('${x} tool selected')">${x}</button>`).join('')}</div><div class="sub">Portrait</div>${slider('skin','Skin Smooth',0,100,0)}${slider('eyes','Eye Enhance',0,100,0)}${slider('teeth','Teeth White',0,100,0)}`); if(name==='crop')el.innerHTML=section('Crop & Geometry',`<div class="grid3">${['Free','1:1','4:5','3:4','4:3','16:9','9:16','3:2','2:3'].map(x=>`<button class="btn" onclick="cropAspect('${x}')">${x}</button>`).join('')}</div><div class="sub">Transform</div><div class="grid2"><button class="btn" onclick="rotate(-90)">↺ Rotate</button><button class="btn" onclick="rotate(90)">↻ Rotate</button><button class="btn" onclick="flip()">↔ Flip</button><button class="btn" onclick="toast('Perspective grid ready')">Perspective</button></div>`); if(name==='text')el.innerHTML=section('Typography Studio',`<input id="textInput" class="field" placeholder="Write your text"><select id="font" class="select"><option>Arial</option><option>Georgia</option><option>Impact</option><option>Trebuchet MS</option><option>Courier New</option><option>Times New Roman</option></select>${slider('textSize','Size',12,220,64)}<div class="grid2"><input id="textColor" class="color" type="color" value="#ffffff"><input id="textBg" class="color" type="color" value="#000000"></div><div class="sub">Style</div><div class="grid2"><button class="btn" onclick="addText('fill')">Add Text</button><button class="btn" onclick="addText('outline')">Outline Text</button><button class="btn" onclick="addText('glow')">Glow Text</button><button class="btn" onclick="addText('label')">Label Text</button></div><p style="font-size:10px;color:var(--muted);margin-top:10px">Added text stays editable as a layer: move, scale, rotate, duplicate or delete.</p>`); if(name==='stickers')renderStickerTool(el); if(name==='shapes')el.innerHTML=section('Shapes',`<div class="grid3">${['●','■','◆','★','♥','➜','☁','✦','✚','▬','○','◇'].map(x=>`<button class="sticker" onclick="addSticker('${x}')">${x}</button>`).join('')}</div><div class="sub">Custom</div><button class="btn" style="width:100%" onclick="toast('Custom SVG/PNG shapes can be added here')">＋ Add Shape</button>`); if(name==='draw')el.innerHTML=section('Drawing',slider('brush','Brush Size',1,80,8)+`<input id="brushColor" class="color" type="color" value="#ffffff"><div class="grid2"><button class="btn" onclick="toggleDraw()">🖌️ Draw</button><button class="btn" onclick="toast('Eraser mode ready')">Eraser</button><button class="btn" onclick="toast('Neon brush ready')">Neon</button><button class="btn" onclick="toast('Airbrush ready')">Airbrush</button></div>`); if(name==='overlay')el.innerHTML=section('Overlays & Double Exposure',`<div class="grid2"><button class="btn" onclick="fileInput.dataset.mode='overlay';fileInput.click()">＋ Add Photo</button><button class="btn" onclick="toast('Double exposure mode')">Double Exposure</button><button class="btn" onclick="toast('Light leak overlay')">Light Leak</button><button class="btn" onclick="toast('Film dust overlay')">Film Dust</button></div><div class="sub">Blend</div>${slider('opacity','Opacity',0,100,100)}`); if(name==='frames')el.innerHTML=section('Frames',`<div class="grid3">${[['none','None'],['white','White'],['black','Black'],['gold','Gold'],['purple','Purple'],['red','Red'],['film','Film'],['shadow','Shadow'],['double','Double']].map(x=>`<button class="btn" onclick="setFrame('${x[0]}')">${x[1]}</button>`).join('')}</div>`); if(name==='ai')el.innerHTML=section('AI Studio',`<div class="grid2">${['🪄 Background Remover','✨ AI Enhance','🧹 Object Remover','🔍 AI Upscale','🌄 AI Background','💡 AI Relight','👤 AI Portrait','🎨 AI Style','↔ AI Expand','🧼 AI Clean Up'].map(x=>`<button class="btn" onclick="aiTool('${x.replace(/^\\\S+\\\s/,'')}')">${x}</button>`).join('')}</div><div class="sub">AI Prompt</div><input id="aiPrompt" class="field" placeholder="Describe what you want to change..."><button class="btn" style="width:100%;background:var(--accent)" onclick="runPrompt()">✨ Apply AI Prompt</button><p style="font-size:10px;color:var(--muted);margin-top:10px">This interface is ready to connect to your AI backend/API. The browser editor itself does not invent AI results without a connected model.</p>`); if(name==='collage')el.innerHTML=section('Collage Studio',`<div class="grid2">${['2 Photos','3 Photos','4 Photos','6 Photos','9 Grid','Freestyle','Magazine','Polaroid'].map(x=>`<button class="btn" onclick="toast('${x} layout selected')">${x}</button>`).join('')}</div><div class="sub">Social sizes</div><div class="grid2">${['Instagram 1:1','Story 9:16','YouTube 16:9','WhatsApp Status'].map(x=>`<button class="btn" onclick="toast('${x}')">${x}</button>`).join('')}</div>`); if(name==='layers')el.innerHTML=section('Layers',`<div id="layers"></div><div class="grid2"><button class="btn" onclick="duplicateSelected()">Duplicate</button><button class="btn" onclick="deleteSelected()">Delete</button><button class="btn" onclick="moveLayer(-1)">Move Up</button><button class="btn" onclick="moveLayer(1)">Move Down</button></div>`); if(name==='social')el.innerHTML=section('Social Canvas',`<div class="grid2">${['Instagram Post','Instagram Story','YouTube Thumbnail','YouTube Banner','WhatsApp Status','Facebook Post','Pinterest','Custom'].map(x=>`<button class="btn" onclick="toast('${x} preset')">${x}</button>`).join('')}</div><div class="sub">Export</div><p style="font-size:11px;color:var(--muted);line-height:1.5">Use Export to choose JPG, PNG or WEBP and quality. High-resolution output uses the full project canvas.</p>`); if(name==='layers')refreshLayers(); } function renderStickerTool(el){ let cats=Object.keys(stickers); el.innerHTML=section('Sticker Studio',`<div class="chips">${cats.map((c,i)=>`<button class="chip ${i?'':'active'}" onclick="showStickerCat('${c}')">${c}</button>`).join('')}</div><div id="stickerArea" class="stickers" style="margin-top:10px"></div><div class="sub">Your sticker</div><button class="btn" style="width:100%" onclick="fileInput.dataset.mode='sticker';fileInput.click()">＋ Create Sticker From Photo</button>`); showStickerCat(cats[0]); } function showStickerCat(cat){const a=document.getElementById('stickerArea');if(!a)return;a.innerHTML=stickers[cat].map(s=>`<button class="sticker" onclick="addSticker(${JSON.stringify(s)})">${esc(s)}</button>`).join('')} function setFilter(v){filter=v;render();commit()} function rotate(d){rotation=(rotation+d)%360;render();commit()} function flip(){flipX*=-1;render();commit()} function setFrame(v){frame=v;render();commit()} function resetAdjust(){Object.keys(base).forEach(k=>base[k]=0);render();commit();openTool('adjust')} function autoEnhance(){base.brightness=8;base.contrast=10;base.saturation=12;base.shadows=8;base.highlights=-6;base.clarity=12;render();commit();toast('Auto Enhance applied')} function resetProject(){if(!projectLoaded)return;rotation=0;flipX=flipY=1;filter='none';frame='none';Object.keys(base).forEach(k=>base[k]=0);objects=[];selectedId=null;render();commit();refreshLayers();toast('Project reset')} function newId(){return Math.random().toString(36).slice(2,10)} function addText(style='fill'){ if(!projectLoaded)return toast('Upload a photo first'); const text=document.getElementById('textInput')?.value.trim();if(!text)return toast('Enter text first'); objects.push({id:newId(),type:'text',text,font:document.getElementById('font').value,size:Number(document.getElementById('textSize').value),color:document.getElementById('textColor').value,bg:document.getElementById('textBg').value,style,x:canvas.width/2,y:canvas.height/2,scale:1,rotation:0,opacity:1}); selectedId=objects.at(-1).id;render();commit();refreshLayers() } function addSticker(text){ if(!projectLoaded)return toast('Upload a photo first'); objects.push({id:newId(),type:'sticker',text:String(text),font:'Arial',size:String(text).length>3?46:100,color:'#fff',x:canvas.width/2,y:canvas.height/2,scale:1,rotation:0,opacity:1}); selectedId=objects.at(-1).id;render();commit();refreshLayers() } function refreshLayers(){ const box=document.getElementById('layers');if(!box)return; box.innerHTML=`<div class="layer ${selectedId==='photo'?'sel':''}" onclick="selectLayer('photo')"><div class="thumb">🖼️</div><div class="name">Photo</div></div>`+ objects.slice().reverse().map(o=>`<div class="layer ${selectedId===o.id?'sel':''}" onclick="selectLayer('${o.id}')"><div class="thumb">${o.type==='text'?'🔤':'😊'}</div><div class="name">${esc(o.text||o.type)}</div><button onclick="event.stopPropagation();deleteLayer('${o.id}')">🗑️</button></div>`).join('') } function selectLayer(id){selectedId=id;refreshLayers();updateSelection()} function deleteLayer(id){objects=objects.filter(o=>o.id!==id);if(selectedId===id)selectedId=null;render();commit();refreshLayers()} function deleteSelected(){if(selectedId&&selectedId!=='photo')deleteLayer(selectedId)} function duplicateSelected(){const o=objects.find(x=>x.id===selectedId);if(!o)return;const n={...o,id:newId(),x:o.x+30,y:o.y+30};objects.push(n);selectedId=n.id;render();commit();refreshLayers()} function moveLayer(dir){const i=objects.findIndex(o=>o.id===selectedId);if(i<0)return;const j=i+dir;if(j<0||j>=objects.length)return;[objects[i],objects[j]]=[objects[j],objects[i]];render();commit();refreshLayers()} function aiTool(n){toast(n+' requires your AI API connection');} function runPrompt(){const p=document.getElementById('aiPrompt')?.value.trim();toast(p?`AI request prepared: ${p}`:'Describe an edit first')} function cropAspect(r){toast(`Crop ${r} selected — drag/crop engine can be connected next`)} function toggleDraw(){drawing=!drawing;toast(drawing?'Drawing enabled':'Drawing disabled')} function toggleCompare(){document.getElementById('compare').style.display='flex'} function showEdited(){compareOriginal=false;render()} function showOriginal(){if(!originalSrc)return;compareOriginal=true;const im=new Image();im.onload=()=>{canvas.width=im.naturalWidth;canvas.height=im.naturalHeight;ctx.filter='none';ctx.drawImage(im,0,0)};im.src=originalSrc} function openExport(){if(!projectLoaded)return toast('Upload a photo first');document.getElementById('exportModal').style.display='flex'} function closeExport(){document.getElementById('exportModal').style.display='none'} document.getElementById('quality').oninput=e=>document.getElementById('qualityValue').textContent=e.target.value+'%' function exportImage(){const f=document.getElementById('format').value,q=Number(document.getElementById('quality').value)/100,a=document.createElement('a');a.download='pixora-pro.'+(f==='image/png'?'png':f==='image/webp'?'webp':'jpg');a.href=canvas.toDataURL(f,q);a.click();closeExport();toast('Photo exported')} function buildFilter(){let b=100+base.brightness;let c=100+base.contrast;let s=100+base.saturation;let e=Math.pow(2,base.exposure/100);let blur=Math.max(0,Math.abs(base.clarity<0?base.clarity/50:0));let parts=[`brightness(${b*e}%)`,`contrast(${c}%)`,`saturate(${Math.max(0,s+base.vibrance)}%)`,`blur(${blur}px)`];if(base.temperature>0)parts.push(`sepia(${base.temperature/450})`);if(base.temperature<0)parts.push(`hue-rotate(${base.temperature/3}deg)`);if(base.tint)parts.push(`hue-rotate(${base.tint/4}deg)`);if(base.fade)parts.push(`opacity(${1-base.fade/220})`);if(filter!=='none')parts.push(filter);return parts.join(' ')} function render(){ if(!projectLoaded||compareOriginal)return; const a=((rotation%360)+360)%360,rot=a===90||a===270; canvas.width=rot?image.naturalHeight:image.naturalWidth;canvas.height=rot?image.naturalWidth:image.naturalHeight; ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(rotation*Math.PI/180);ctx.scale(flipX,flipY);ctx.filter=buildFilter();ctx.drawImage(image,-image.naturalWidth/2,-image.naturalHeight/2);ctx.restore(); drawCreative();drawObjects();applyFrame();updateSelection(); } function drawCreative(){ if(base.vignette>0){const g=ctx.createRadialGradient(canvas.width/2,canvas.height/2,Math.min(canvas.width,canvas.height)*.18,canvas.width/2,canvas.height/2,Math.max(canvas.width,canvas.height)*.72);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${base.vignette/100})`);ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height)} if(base.grain>0){ctx.save();ctx.globalAlpha=base.grain/300;for(let i=0;i<Math.min(12000,canvas.width*canvas.height/10);i++){ctx.fillStyle=Math.random()>.5?'#fff':'#000';ctx.fillRect(Math.random()*canvas.width,Math.random()*canvas.height,1,1)}ctx.restore()} } function drawObjects(){ objects.forEach(o=>{ctx.save();ctx.globalAlpha=o.opacity??1;ctx.translate(o.x,o.y);ctx.rotate((o.rotation||0)*Math.PI/180);ctx.scale(o.scale||1,o.scale||1); if(o.type==='text'){ctx.font=`700 ${o.size}px ${o.font}`;ctx.textAlign='center';ctx.textBaseline='middle';if(o.style==='outline'){ctx.lineWidth=Math.max(2,o.size/18);ctx.strokeStyle=o.color;ctx.strokeText(o.text,0,0)}else{if(o.style==='label'){const m=ctx.measureText(o.text);ctx.fillStyle=o.bg+'dd';ctx.fillRect(-m.width/2-o.size*.18,-o.size*.65,m.width+o.size*.36,o.size*1.25)}ctx.fillStyle=o.color;if(o.style==='glow'){ctx.shadowColor=o.color;ctx.shadowBlur=o.size*.28}ctx.fillText(o.text,0,0)}}else{ctx.font=`${o.size}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.25)';ctx.shadowBlur=5;ctx.fillStyle=o.color||'#fff';ctx.fillText(o.text,0,0)}ctx.restore()}) } function applyFrame(){if(frame==='none')return;const s=Math.max(10,Math.min(canvas.width,canvas.height)*.025);ctx.save();ctx.lineWidth=s;if(frame==='white')ctx.strokeStyle='#fff';else if(frame==='black')ctx.strokeStyle='#000';else if(frame==='gold')ctx.strokeStyle='#c79d4b';else if(frame==='purple')ctx.strokeStyle='#7657ff';else if(frame==='red')ctx.strokeStyle='#e76d6d';else if(frame==='film')ctx.strokeStyle='#111';else if(frame==='shadow'){ctx.shadowColor='#000';ctx.shadowBlur=s*2;ctx.strokeStyle='#fff'}else if(frame==='double')ctx.strokeStyle='#fff';ctx.strokeRect(s/2,s/2,canvas.width-s,canvas.height-s);if(frame==='double'){ctx.lineWidth=s*.35;ctx.strokeStyle='#000';ctx.strokeRect(s*1.4,s*1.4,canvas.width-s*2.8,canvas.height-s*2.8)}ctx.restore()} function updateSelection(){ const o=objects.find(x=>x.id===selectedId);if(!o){selection.style.display='none';return} const sx=canvas.getBoundingClientRect(),cr=wrap.getBoundingClientRect();let w=Math.max(40,(o.type==='text'?o.size*o.text.length*.55:o.size)*Math.abs(o.scale||1));let h=o.size*1.25*Math.abs(o.scale||1);selection.style.display='block';selection.style.width=w*(sx.width/canvas.width)+'px';selection.style.height=h*(sx.height/canvas.height)+'px';selection.style.left=(o.x/canvas.width*sx.width-w*sx.width/canvas.width/2)+'px';selection.style.top=(o.y/canvas.height*sx.height-h*sx.height/canvas.height/2)+'px';selection.style.transform=`rotate(${o.rotation||0}deg)`} let drawing=false,drawingActive=false; canvas.addEventListener('pointerdown',e=>{if(drawing){drawingActive=true;const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y);return}const p=point(e);let hit=null;for(let i=objects.length-1;i>=0;i--){const o=objects[i],r=(o.size||80)*(o.scale||1);if(Math.abs(p.x-o.x)<r&&Math.abs(p.y-o.y)<r){hit=o;break}}if(hit){selectedId=hit.id;refreshLayers();drag={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};canvas.setPointerCapture(e.pointerId);updateSelection()}}); canvas.addEventListener('pointermove',e=>{if(drawing&&drawingActive){const p=point(e);ctx.lineWidth=Number(document.getElementById('brush')?.value||8);ctx.lineCap='round';ctx.strokeStyle=document.getElementById('brushColor')?.value||'#fff';ctx.lineTo(p.x,p.y);ctx.stroke();return}if(drag){const p=point(e),o=objects.find(x=>x.id===drag.id);if(o){o.x=p.x-drag.dx;o.y=p.y-drag.dy;render()}}}); canvas.addEventListener('pointerup',()=>{if(drawing&&drawingActive){drawingActive=false;commit();return}if(drag){drag=null;commit();refreshLayers()}}); let drag=null; function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}} fileInput.addEventListener('click',()=>{ fileInput.value=''; });
+<script>  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'); const empty=document.getElementById('empty'),stage=document.getElementById('stage'),wrap=document.getElementById('canvasWrap'); const selection=document.getElementById('selection'),fileInput=document.getElementById('fileInput'),panel=document.getElementById('panel'); const workspace=document.getElementById('workspace'); let image=new Image(), originalSrc='', projectLoaded=false, selectedId=null, compareOriginal=false; let base={brightness:0,contrast:0,saturation:0,exposure:0,temperature:0,tint:0,highlights:0,shadows:0,whites:0,blacks:0,vibrance:0,clarity:0,sharpness:0,fade:0,grain:0,vignette:0}; let filter='none', rotation=0, flipX=1, flipY=1, frame='none', objects=[], history=[], future=[]; const toolNames=['adjust','color','filters','effects','retouch','crop','text','stickers','shapes','draw','overlay','frames','ai','collage','layers','social']; const presets=[ ['Original','none'],['Vivid','saturate(1.45) contrast(1.08)'],['Cinema','contrast(1.18) saturate(.88)'],['Warm','sepia(.18) saturate(1.18)'],['Cool','hue-rotate(12deg) saturate(.9)'],['B&W','grayscale(1) contrast(1.1)'],['Noir','grayscale(1) contrast(1.35) brightness(.9)'],['Vintage','sepia(.45) contrast(1.05)'],['Fade','contrast(.9) brightness(1.06) saturate(.8)'],['Drama','grayscale(.55) contrast(1.45)'],['Glow','brightness(1.08) saturate(1.15) contrast(1.05)'],['HDR','contrast(1.32) saturate(1.3)'],['Retro','sepia(.25) saturate(1.3) contrast(1.08)'],['Dream','brightness(1.12) contrast(.9) saturate(1.12) blur(.2px)'],['Film','contrast(1.12) saturate(.92) sepia(.08)'],['Pop','saturate(1.8) contrast(1.12)'],['Matte','contrast(.9) saturate(.75) brightness(1.04)'],['Night','brightness(.78) contrast(1.25) saturate(.85)'],['Golden','sepia(.3) saturate(1.45) brightness(1.05)'],['Frost','hue-rotate(18deg) saturate(.7) brightness(1.08)'] ]; const effectPresets=[ ['Bloom','brightness(1.08) saturate(1.15) blur(.35px)'],['Soft Focus','blur(1px) brightness(1.04) contrast(.94)'],['Neon','saturate(2) contrast(1.3)'],['Glitch','contrast(1.3) saturate(1.7)'],['VHS','contrast(.95) saturate(.85) sepia(.08)'],['Prism','hue-rotate(25deg) saturate(1.3)'],['Color Pop','saturate(2.1) contrast(1.08)'],['Dark Mood','brightness(.82) contrast(1.25) saturate(.9)'],['Sunset','sepia(.24) saturate(1.55) brightness(1.03)'],['Paper','grayscale(.18) contrast(.96) sepia(.15)'],['Halftone','contrast(1.35) saturate(.9)'],['Dream Glow','brightness(1.1) contrast(.88) saturate(1.18) blur(.55px)'] ]; const stickers={ Popular:['❤️','🔥','⭐','✨','😍','😂','😎','🎉','💯','👑'], Love:['💕','💖','💘','💋','🌹','🫶','💞','💓','🥰','💍'], Travel:['✈️','🌴','🏝️','🗺️','📍','🚗','🎒','⛺','🌊','🗿'], Food:['🍕','🍔','🍟','🍰','☕','🍓','🍩','🍜','🍦','🥤'], Nature:['🌸','🌻','🦋','🌈','🌿','🌙','☀️','🍃','🌺','🌲'], Social:['LIKE','FOLLOW','NEW','SALE','WOW','OMG','SUBSCRIBE','LOVE','VLOG','2026'], Decor:['✦','✧','★','☆','❀','❖','➜','♥','☁️','⚡'] };
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(window._avaToast);window._avaToast=setTimeout(()=>el.classList.remove('show'),1600)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function openTool(name,button){ toolNames.forEach(n=>document.getElementById('tool-'+n)?.remove()); document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active')); if(button)button.classList.add('active'); const el=document.createElement('div');el.id='tool-'+name;panel.appendChild(el); renderTool(name,el); }
+function section(title,body){return `<div class="title">${title}</div>${body}`}
+function slider(id,label,min,max,val,step=1){return `<div class="row"><div class="label">${label}<span id="${id}Val">${val}</span></div><input id="${id}" type="range" min="${min}" max="${max}" value="${val}" step="${step}"></div>`}
+function bindSlider(id,key){const x=document.getElementById(id);if(!x)return;x.value=base[key]??0;x.oninput=()=>{base[key]=Number(x.value);document.getElementById(id+'Val').textContent=x.value;render()};x.onchange=commit}
+function commit(){history.push(snapshot());if(history.length>40)history.shift();future=[]}
+function snapshot(){return JSON.stringify({base,filter,rotation,flipX,flipY,frame,objects:objects.map(o=>({...o,visible:o.visible!==false,locked:!!o.locked,opacity:o.opacity??1,blend:o.blend||'source-over',flipX:o.flipX||1,flipY:o.flipY||1}))})}
+function restore(s){const p=JSON.parse(s);base=p.base;filter=p.filter;rotation=p.rotation;flipX=p.flipX;flipY=p.flipY;frame=p.frame;objects=p.objects;selectedId=null;render();refreshLayers()}
+function undo(){if(!history.length)return;future.push(snapshot());restore(history.pop())}
+function redo(){if(!future.length)return;history.push(snapshot());restore(future.pop())}
+function renderTool(name,el){ if(name==='adjust')el.innerHTML=section('Light & Detail', slider('brightness','Brightness',-100,100,0)+slider('contrast','Contrast',-100,100,0)+slider('exposure','Exposure',-100,100,0)+slider('highlights','Highlights',-100,100,0)+slider('shadows','Shadows',-100,100,0)+slider('whites','Whites',-100,100,0)+slider('blacks','Blacks',-100,100,0)+slider('clarity','Clarity',-100,100,0)+slider('sharpness','Sharpness',0,100,0)+slider('fade','Fade',0,100,0)+slider('grain','Grain',0,100,0)+slider('vignette','Vignette',0,100,0)+`<div class="grid2"><button class="btn" onclick="autoEnhance()">✨ Auto Enhance</button><button class="btn" onclick="resetAdjust()">Reset</button></div>`); ['brightness','contrast','exposure','highlights','shadows','whites','blacks','clarity','sharpness','fade','grain','vignette'].forEach(k=>bindSlider(k,k)); if(name==='color')el.innerHTML=section('Color Studio', slider('saturation','Saturation',-100,100,0)+slider('vibrance','Vibrance',-100,100,0)+slider('temperature','Temperature',-100,100,0)+slider('tint','Tint',-100,100,0)+`<div class="sub">HSL / Color Mix</div><div class="chips">${['Red','Orange','Yellow','Green','Cyan','Blue','Purple','Magenta'].map(x=>`<button class="chip" onclick="toast('${x} mixer ready')">${x}</button>`).join('')}</div><p style="color:var(--muted);font-size:11px;line-height:1.5;margin-top:10px">Advanced per-color masking is prepared for the next rendering-engine stage.</p>`); ['saturation','vibrance','temperature','tint'].forEach(k=>bindSlider(k,k)); if(name==='filters')el.innerHTML=section('Professional Presets',`<div class="chips">${['All','Cinematic','Film','Vintage','Portrait','B&W'].map((x,i)=>`<button class="chip ${i?'':'active'}">${x}</button>`).join('')}</div><div class="grid3" style="margin-top:10px">${presets.map((p,i)=>`<button class="preset" onclick="setFilter(${JSON.stringify(p[1])})"><div class="presetPreview" style="filter:${p[1]}"></div><span>${p[0]}</span></button>`).join('')}</div>`); if(name==='effects')el.innerHTML=section('Creative Effects',`<div class="chips">${['Light','Blur','Cinematic','Glitch','Texture','Dream'].map(x=>`<button class="chip">${x}</button>`).join('')}</div><div class="grid3" style="margin-top:10px">${effectPresets.map(p=>`<button class="preset" onclick="setFilter(${JSON.stringify(p[1])})"><div class="presetPreview" style="filter:${p[1]}"></div><span>${p[0]}</span></button>`).join('')}</div><div class="sub">Extra controls</div>${slider('effectIntensity','Intensity',0,100,100)}`); if(name==='retouch')el.innerHTML=section('Retouch',`<div class="grid2">${['Healing','Clone','Blemish','Whiten','Smooth','Sharpen','Dodge','Burn','Red Eye','Object Remove'].map(x=>`<button class="btn" onclick="toast('${x} tool selected')">${x}</button>`).join('')}</div><div class="sub">Portrait</div>${slider('skin','Skin Smooth',0,100,0)}${slider('eyes','Eye Enhance',0,100,0)}${slider('teeth','Teeth White',0,100,0)}`); if(name==='crop')el.innerHTML=section('Crop & Geometry',`<div class="grid3">${['Free','1:1','4:5','3:4','4:3','16:9','9:16','3:2','2:3'].map(x=>`<button class="btn" onclick="cropAspect('${x}')">${x}</button>`).join('')}</div><div class="sub">Transform</div><div class="grid2"><button class="btn" onclick="rotate(-90)">↺ Rotate</button><button class="btn" onclick="rotate(90)">↻ Rotate</button><button class="btn" onclick="flip()">↔ Flip</button><button class="btn" onclick="toast('Perspective grid ready')">Perspective</button></div>`); if(name==='text')el.innerHTML=section('Typography Studio',`<input id="textInput" class="field" placeholder="Write your text"><select id="font" class="select"><option>Arial</option><option>Georgia</option><option>Impact</option><option>Trebuchet MS</option><option>Courier New</option><option>Times New Roman</option></select>${slider('textSize','Size',12,220,64)}<div class="grid2"><input id="textColor" class="color" type="color" value="#ffffff"><input id="textBg" class="color" type="color" value="#000000"></div><div class="sub">Style</div><div class="grid2"><button class="btn" onclick="addText('fill')">Add Text</button><button class="btn" onclick="addText('outline')">Outline Text</button><button class="btn" onclick="addText('glow')">Glow Text</button><button class="btn" onclick="addText('label')">Label Text</button></div><p style="font-size:10px;color:var(--muted);margin-top:10px">Added text stays editable as a layer: move, scale, rotate, duplicate or delete.</p>`); if(name==='stickers')renderStickerTool(el); if(name==='shapes')el.innerHTML=section('Shapes',`<div class="grid3">${['●','■','◆','★','♥','➜','☁','✦','✚','▬','○','◇'].map(x=>`<button class="sticker" onclick="addSticker('${x}')">${x}</button>`).join('')}</div><div class="sub">Custom</div><button class="btn" style="width:100%" onclick="toast('Custom SVG/PNG shapes can be added here')">＋ Add Shape</button>`); if(name==='draw')el.innerHTML=section('Drawing',slider('brush','Brush Size',1,80,8)+`<input id="brushColor" class="color" type="color" value="#ffffff"><div class="grid2"><button class="btn" onclick="toggleDraw()">🖌️ Draw</button><button class="btn" onclick="toast('Eraser mode ready')">Eraser</button><button class="btn" onclick="toast('Neon brush ready')">Neon</button><button class="btn" onclick="toast('Airbrush ready')">Airbrush</button></div>`); if(name==='overlay')el.innerHTML=section('Overlays & Double Exposure',`<div class="grid2"><button class="btn" onclick="fileInput.dataset.mode='overlay';fileInput.click()">＋ Add Photo</button><button class="btn" onclick="toast('Double exposure mode')">Double Exposure</button><button class="btn" onclick="toast('Light leak overlay')">Light Leak</button><button class="btn" onclick="toast('Film dust overlay')">Film Dust</button></div><div class="sub">Blend</div>${slider('opacity','Opacity',0,100,100)}`); if(name==='frames')el.innerHTML=section('Frames',`<div class="grid3">${[['none','None'],['white','White'],['black','Black'],['gold','Gold'],['purple','Purple'],['red','Red'],['film','Film'],['shadow','Shadow'],['double','Double']].map(x=>`<button class="btn" onclick="setFrame('${x[0]}')">${x[1]}</button>`).join('')}</div>`); if(name==='ai')el.innerHTML=section('AI Studio',`<div class="grid2">${['🪄 Background Remover','✨ AI Enhance','🧹 Object Remover','🔍 AI Upscale','🌄 AI Background','💡 AI Relight','👤 AI Portrait','🎨 AI Style','↔ AI Expand','🧼 AI Clean Up'].map(x=>`<button class="btn" onclick="aiTool('${x.replace(/^\\\S+\\\s/,'')}')">${x}</button>`).join('')}</div><div class="sub">AI Prompt</div><input id="aiPrompt" class="field" placeholder="Describe what you want to change..."><button class="btn" style="width:100%;background:var(--accent)" onclick="runPrompt()">✨ Apply AI Prompt</button><p style="font-size:10px;color:var(--muted);margin-top:10px">This interface is ready to connect to your AI backend/API. The browser editor itself does not invent AI results without a connected model.</p>`); if(name==='collage')el.innerHTML=section('Collage Studio',`<div class="grid2">${['2 Photos','3 Photos','4 Photos','6 Photos','9 Grid','Freestyle','Magazine','Polaroid'].map(x=>`<button class="btn" onclick="toast('${x} layout selected')">${x}</button>`).join('')}</div><div class="sub">Social sizes</div><div class="grid2">${['Instagram 1:1','Story 9:16','YouTube 16:9','WhatsApp Status'].map(x=>`<button class="btn" onclick="toast('${x}')">${x}</button>`).join('')}</div>`); if(name==='layers')el.innerHTML=section('Layers',`<div id="layers"></div><div class="grid2"><button class="btn" onclick="duplicateSelected()">Duplicate</button><button class="btn" onclick="deleteSelected()">Delete</button><button class="btn" onclick="moveLayer(-1)">Move Up</button><button class="btn" onclick="moveLayer(1)">Move Down</button></div>`); if(name==='social')el.innerHTML=section('Social Canvas',`<div class="grid2">${['Instagram Post','Instagram Story','YouTube Thumbnail','YouTube Banner','WhatsApp Status','Facebook Post','Pinterest','Custom'].map(x=>`<button class="btn" onclick="toast('${x} preset')">${x}</button>`).join('')}</div><div class="sub">Export</div><p style="font-size:11px;color:var(--muted);line-height:1.5">Use Export to choose JPG, PNG or WEBP and quality. High-resolution output uses the full project canvas.</p>`); if(name==='layers')refreshLayers(); }
+function renderStickerTool(el){ let cats=Object.keys(stickers); el.innerHTML=section('Sticker Studio',`<div class="chips">${cats.map((c,i)=>`<button class="chip ${i?'':'active'}" onclick="showStickerCat('${c}')">${c}</button>`).join('')}</div><div id="stickerArea" class="stickers" style="margin-top:10px"></div><div class="sub">Your sticker</div><button class="btn" style="width:100%" onclick="fileInput.dataset.mode='sticker';fileInput.click()">＋ Create Sticker From Photo</button>`); showStickerCat(cats[0]); }
+function showStickerCat(cat){const a=document.getElementById('stickerArea');if(!a)return;a.innerHTML=stickers[cat].map(s=>`<button class="sticker" onclick="addSticker(${JSON.stringify(s)})">${esc(s)}</button>`).join('')}
+function setFilter(v){filter=v;render();commit()}
+function rotate(d){rotation=(rotation+d)%360;render();commit()}
+function flip(){flipX*=-1;render();commit()}
+function setFrame(v){frame=v;render();commit()}
+function resetAdjust(){Object.keys(base).forEach(k=>base[k]=0);render();commit();openTool('adjust')}
+function autoEnhance(){base.brightness=8;base.contrast=10;base.saturation=12;base.shadows=8;base.highlights=-6;base.clarity=12;render();commit();toast('Auto Enhance applied')}
+function resetProject(){if(!projectLoaded)return;rotation=0;flipX=flipY=1;filter='none';frame='none';Object.keys(base).forEach(k=>base[k]=0);objects=[];selectedId=null;render();commit();refreshLayers();toast('Project reset')}
+function newId(){return Math.random().toString(36).slice(2,10)}
+function addText(style='fill'){ if(!projectLoaded)return toast('Upload a photo first'); const text=document.getElementById('textInput')?.value.trim();if(!text)return toast('Enter text first'); objects.push({id:newId(),type:'text',text,font:document.getElementById('font').value,size:Number(document.getElementById('textSize').value),color:document.getElementById('textColor').value,bg:document.getElementById('textBg').value,style,x:canvas.width/2,y:canvas.height/2,scale:1,rotation:0,opacity:1}); selectedId=objects.at(-1).id;render();commit();refreshLayers() }
+function addSticker(text){ if(!projectLoaded)return toast('Upload a photo first'); objects.push({id:newId(),type:'sticker',text:String(text),font:'Arial',size:String(text).length>3?46:100,color:'#fff',x:canvas.width/2,y:canvas.height/2,scale:1,rotation:0,opacity:1}); selectedId=objects.at(-1).id;render();commit();refreshLayers() }
+function refreshLayers(){ const box=document.getElementById('layers');if(!box)return; box.innerHTML=`<div class="layer ${selectedId==='photo'?'sel':''}" onclick="selectLayer('photo')"><div class="thumb">🖼️</div><div class="name">Photo</div></div>`+ objects.slice().reverse().map(o=>`<div class="layer ${selectedId===o.id?'sel':''}" onclick="selectLayer('${o.id}')"><div class="thumb">${o.type==='text'?'🔤':'😊'}</div><div class="name">${esc(o.text||o.type)}</div><button onclick="event.stopPropagation();deleteLayer('${o.id}')">🗑️</button></div>`).join('') }
+function selectLayer(id){selectedId=id;refreshLayers();updateSelection()}
+function deleteLayer(id){objects=objects.filter(o=>o.id!==id);if(selectedId===id)selectedId=null;render();commit();refreshLayers()}
+function deleteSelected(){if(selectedId&&selectedId!=='photo')deleteLayer(selectedId)}
+function duplicateSelected(){const o=objects.find(x=>x.id===selectedId);if(!o)return;const n={...o,id:newId(),x:o.x+30,y:o.y+30};objects.push(n);selectedId=n.id;render();commit();refreshLayers()}
+function moveLayer(dir){const i=objects.findIndex(o=>o.id===selectedId);if(i<0)return;const j=i+dir;if(j<0||j>=objects.length)return;[objects[i],objects[j]]=[objects[j],objects[i]];render();commit();refreshLayers()}
+function aiTool(n){toast(n+' requires your AI API connection');}
+function runPrompt(){const p=document.getElementById('aiPrompt')?.value.trim();toast(p?`AI request prepared: ${p}`:'Describe an edit first')}
+function cropAspect(r){toast(`Crop ${r} selected — drag/crop engine can be connected next`)}
+function toggleDraw(){drawing=!drawing;toast(drawing?'Drawing enabled':'Drawing disabled')}
+function toggleCompare(){document.getElementById('compare').style.display='flex'}
+function showEdited(){compareOriginal=false;render()}
+function showOriginal(){if(!originalSrc)return;compareOriginal=true;const im=new Image();im.onload=()=>{canvas.width=im.naturalWidth;canvas.height=im.naturalHeight;ctx.filter='none';ctx.drawImage(im,0,0)};im.src=originalSrc}
+function openExport(){if(!projectLoaded)return toast('Upload a photo first');document.getElementById('exportModal').style.display='flex'}
+function closeExport(){document.getElementById('exportModal').style.display='none'} document.getElementById('quality').oninput=e=>document.getElementById('qualityValue').textContent=e.target.value+'%'
+function exportImage(){const f=document.getElementById('format').value,q=Number(document.getElementById('quality').value)/100,a=document.createElement('a');a.download='pixora-pro.'+(f==='image/png'?'png':f==='image/webp'?'webp':'jpg');a.href=canvas.toDataURL(f,q);a.click();closeExport();toast('Photo exported')}
+function buildFilter(){let b=100+base.brightness;let c=100+base.contrast;let s=100+base.saturation;let e=Math.pow(2,base.exposure/100);let blur=Math.max(0,Math.abs(base.clarity<0?base.clarity/50:0));let parts=[`brightness(${b*e}%)`,`contrast(${c}%)`,`saturate(${Math.max(0,s+base.vibrance)}%)`,`blur(${blur}px)`];if(base.temperature>0)parts.push(`sepia(${base.temperature/450})`);if(base.temperature<0)parts.push(`hue-rotate(${base.temperature/3}deg)`);if(base.tint)parts.push(`hue-rotate(${base.tint/4}deg)`);if(base.fade)parts.push(`opacity(${1-base.fade/220})`);if(filter!=='none')parts.push(filter);return parts.join(' ')}
+function render(){ if(!projectLoaded||compareOriginal)return; const a=((rotation%360)+360)%360,rot=a===90||a===270; canvas.width=rot?image.naturalHeight:image.naturalWidth;canvas.height=rot?image.naturalWidth:image.naturalHeight; ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(rotation*Math.PI/180);ctx.scale(flipX,flipY);ctx.filter=buildFilter();ctx.drawImage(image,-image.naturalWidth/2,-image.naturalHeight/2);ctx.restore(); drawCreative();drawObjects();applyFrame();updateSelection(); }
+function drawCreative(){ if(base.vignette>0){const g=ctx.createRadialGradient(canvas.width/2,canvas.height/2,Math.min(canvas.width,canvas.height)*.18,canvas.width/2,canvas.height/2,Math.max(canvas.width,canvas.height)*.72);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${base.vignette/100})`);ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height)} if(base.grain>0){ctx.save();ctx.globalAlpha=base.grain/300;for(let i=0;i<Math.min(12000,canvas.width*canvas.height/10);i++){ctx.fillStyle=Math.random()>.5?'#fff':'#000';ctx.fillRect(Math.random()*canvas.width,Math.random()*canvas.height,1,1)}ctx.restore()} }
+function drawObjects(){ objects.forEach(o=>{ctx.save();ctx.globalAlpha=o.opacity??1;ctx.translate(o.x,o.y);ctx.rotate((o.rotation||0)*Math.PI/180);ctx.scale(o.scale||1,o.scale||1); if(o.type==='text'){ctx.font=`700 ${o.size}px ${o.font}`;ctx.textAlign='center';ctx.textBaseline='middle';if(o.style==='outline'){ctx.lineWidth=Math.max(2,o.size/18);ctx.strokeStyle=o.color;ctx.strokeText(o.text,0,0)}else{if(o.style==='label'){const m=ctx.measureText(o.text);ctx.fillStyle=o.bg+'dd';ctx.fillRect(-m.width/2-o.size*.18,-o.size*.65,m.width+o.size*.36,o.size*1.25)}ctx.fillStyle=o.color;if(o.style==='glow'){ctx.shadowColor=o.color;ctx.shadowBlur=o.size*.28}ctx.fillText(o.text,0,0)}}else{ctx.font=`${o.size}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.25)';ctx.shadowBlur=5;ctx.fillStyle=o.color||'#fff';ctx.fillText(o.text,0,0)}ctx.restore()}) }
+function applyFrame(){if(frame==='none')return;const s=Math.max(10,Math.min(canvas.width,canvas.height)*.025);ctx.save();ctx.lineWidth=s;if(frame==='white')ctx.strokeStyle='#fff';else if(frame==='black')ctx.strokeStyle='#000';else if(frame==='gold')ctx.strokeStyle='#c79d4b';else if(frame==='purple')ctx.strokeStyle='#7657ff';else if(frame==='red')ctx.strokeStyle='#e76d6d';else if(frame==='film')ctx.strokeStyle='#111';else if(frame==='shadow'){ctx.shadowColor='#000';ctx.shadowBlur=s*2;ctx.strokeStyle='#fff'}else if(frame==='double')ctx.strokeStyle='#fff';ctx.strokeRect(s/2,s/2,canvas.width-s,canvas.height-s);if(frame==='double'){ctx.lineWidth=s*.35;ctx.strokeStyle='#000';ctx.strokeRect(s*1.4,s*1.4,canvas.width-s*2.8,canvas.height-s*2.8)}ctx.restore()}
+function updateSelection(){ const o=objects.find(x=>x.id===selectedId);if(!o){selection.style.display='none';return} const sx=canvas.getBoundingClientRect(),cr=wrap.getBoundingClientRect();let w=Math.max(40,(o.type==='text'?o.size*o.text.length*.55:o.size)*Math.abs(o.scale||1));let h=o.size*1.25*Math.abs(o.scale||1);selection.style.display='block';selection.style.width=w*(sx.width/canvas.width)+'px';selection.style.height=h*(sx.height/canvas.height)+'px';selection.style.left=(o.x/canvas.width*sx.width-w*sx.width/canvas.width/2)+'px';selection.style.top=(o.y/canvas.height*sx.height-h*sx.height/canvas.height/2)+'px';selection.style.transform=`rotate(${o.rotation||0}deg)`} let drawing=false,drawingActive=false; canvas.addEventListener('pointerdown',e=>{if(drawing){drawingActive=true;const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y);return}const p=point(e);let hit=null;for(let i=objects.length-1;i>=0;i--){const o=objects[i],r=(o.size||80)*(o.scale||1);if(Math.abs(p.x-o.x)<r&&Math.abs(p.y-o.y)<r){hit=o;break}}if(hit){selectedId=hit.id;refreshLayers();drag={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};canvas.setPointerCapture(e.pointerId);updateSelection()}}); canvas.addEventListener('pointermove',e=>{if(drawing&&drawingActive){const p=point(e);ctx.lineWidth=Number(document.getElementById('brush')?.value||8);ctx.lineCap='round';ctx.strokeStyle=document.getElementById('brushColor')?.value||'#fff';ctx.lineTo(p.x,p.y);ctx.stroke();return}if(drag){const p=point(e),o=objects.find(x=>x.id===drag.id);if(o){o.x=p.x-drag.dx;o.y=p.y-drag.dy;render()}}}); canvas.addEventListener('pointerup',()=>{if(drawing&&drawingActive){drawingActive=false;commit();return}if(drag){drag=null;commit();refreshLayers()}}); let drag=null;
+function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}} function openFilePicker(){ fileInput.value=''; fileInput.click(); }
+
+fileInput.addEventListener('click',()=>{ fileInput.value=''; });
 fileInput.addEventListener('click',()=>{ fileInput.value=''; });
 fileInput.addEventListener('change',e=>{
   const f=e.target.files && e.target.files[0];
@@ -215,13 +264,11 @@ fileInput.addEventListener('change',e=>{
 // ===== Ava Pro v3: Professional Layer Transform Engine =====
 
 let transformGesture=null;
-
 function selectedObject(){
 
   return objects.find(o=>o.id===selectedId && selectedId!=='photo');
 
 }
-
 function ensureObjectDefaults(o){
 
   if(!o)return;
@@ -239,7 +286,6 @@ function ensureObjectDefaults(o){
   if(!o.blend)o.blend='source-over';
 
 }
-
 function selectedTransformBox(){
 
   const o=selectedObject();
@@ -283,7 +329,6 @@ function selectedTransformBox(){
   const bm=document.getElementById('blendMode');if(bm)bm.value=o.blend||'source-over';
 
 }
-
 function updateSelection(){
 
   const o=objects.find(x=>x.id===selectedId);
@@ -303,7 +348,6 @@ function updateSelection(){
   selectedTransformBox();
 
 }
-
 function selectLayer(id){
 
   selectedId=id;
@@ -313,11 +357,8 @@ function selectLayer(id){
   updateSelection();
 
 }
-
 function transformDuplicate(){duplicateSelected();selectedTransformBox()}
-
 function transformDelete(){deleteSelected()}
-
 function transformRotateBy(d){
 
   const o=selectedObject();if(!o||o.locked)return;
@@ -325,7 +366,6 @@ function transformRotateBy(d){
   o.rotation=(o.rotation+d)%360;render();commit();selectedTransformBox();refreshLayers();
 
 }
-
 function transformFlipX(){
 
   const o=selectedObject();if(!o||o.locked)return;
@@ -333,7 +373,6 @@ function transformFlipX(){
   o.flipX=-(o.flipX||1);render();commit();selectedTransformBox();
 
 }
-
 function transformReset(){
 
   const o=selectedObject();if(!o||o.locked)return;
@@ -343,7 +382,6 @@ function transformReset(){
   render();commit();selectedTransformBox();
 
 }
-
 function toggleSelectedVisibility(){
 
   const o=selectedObject();if(!o)return;
@@ -353,7 +391,6 @@ function toggleSelectedVisibility(){
   render();commit();refreshLayers();selectedTransformBox();
 
 }
-
 function toggleSelectedLock(){
 
   const o=selectedObject();if(!o)return;
@@ -361,7 +398,6 @@ function toggleSelectedLock(){
   o.locked=!o.locked;commit();refreshLayers();selectedTransformBox();
 
 }
-
 function setSelectedBlend(v){
 
   const o=selectedObject();if(!o)return;
@@ -369,7 +405,6 @@ function setSelectedBlend(v){
   o.blend=v;render();commit();
 
 }
-
 function bindLayerOpacity(){
 
   const x=document.getElementById('layerOpacity');if(!x)return;
@@ -381,7 +416,6 @@ function bindLayerOpacity(){
   x.onchange=commit;
 
 }
-
 function initTransformHandles(){
 
   document.querySelectorAll('#transformBox .th').forEach(h=>{
@@ -467,7 +501,6 @@ document.addEventListener('pointerup',()=>{
 });
 
 // Replace object rendering so hidden/locked/blended/flipped layers behave correctly.
-
 function drawObjects(){
 
   objects.forEach(o=>{
@@ -652,7 +685,6 @@ let colorState={
   }
 
 };
-
 function resetColorStudio(){
 
   hslChannels.forEach(k=>colorState.hsl[k]={h:0,s:0,l:0});
@@ -664,13 +696,11 @@ function resetColorStudio(){
   render();commit();openTool('color');toast('Color Studio reset');
 
 }
-
 function colorRange(id,label,min,max,val,oninput,onchange){
 
   return `<div class="row"><div class="label">${label}<span id="${id}Val">${val}</span></div><input id="${id}" class="miniRange" type="range" min="${min}" max="${max}" value="${val}" step="1"></div>`;
 
 }
-
 function renderProfessionalColor(el){
 
   let hslHtml=hslChannels.map(k=>{
@@ -842,7 +872,6 @@ function renderProfessionalColor(el){
   initCurveEditor();
 
 }
-
 function autoColorGrade(){
 
   base.brightness=6;base.contrast=8;base.saturation=8;base.vibrance=14;
@@ -856,7 +885,6 @@ function autoColorGrade(){
 }
 
 // Curve editor: master RGB tone curve, stored non-destructively.
-
 function curveReset(){
 
   colorState.curves={master:[[0,0],[1,1]]};
@@ -864,7 +892,6 @@ function curveReset(){
   initCurveEditor();render();commit();toast('Curve reset');
 
 }
-
 function curveSorted(){
 
   const pts=colorState.curves.master||[[0,0],[1,1]];
@@ -872,7 +899,6 @@ function curveSorted(){
   return pts.slice().sort((a,b)=>a[0]-b[0]);
 
 }
-
 function curveAddPoint(){
 
   const pts=curveSorted();
@@ -894,7 +920,6 @@ function curveAddPoint(){
   if(!pts.some(p=>Math.abs(p[0]-x)<.03)){pts.push([x,y]);colorState.curves.master=pts;initCurveEditor();render();commit()}
 
 }
-
 function curveEvaluate(x){
 
   const pts=curveSorted();
@@ -918,7 +943,6 @@ function curveEvaluate(x){
   return pts[pts.length-1][1];
 
 }
-
 function initCurveEditor(){
 
   const c=document.getElementById('curveCanvas');if(!c)return;
@@ -926,8 +950,7 @@ function initCurveEditor(){
   const box=document.getElementById('curveBox');
 
   const cc=c.getContext('2d');
-
-  function drawCurve(){
+function drawCurve(){
 
     cc.clearRect(0,0,c.width,c.height);
 
@@ -1004,7 +1027,6 @@ function initCurveEditor(){
 // Approximate the tone curve using a compact per-pixel lookup table.
 
 // This is applied after canvas filter rendering without external libraries.
-
 function applyToneCurve(){
 
   const pts=colorState.curves?.master;
@@ -1026,7 +1048,6 @@ function applyToneCurve(){
 }
 
 // Color grading is represented as screen-like tints based on luminance bands.
-
 function hexRgb(hex){
 
   const n=parseInt(hex.replace('#',''),16);
@@ -1034,7 +1055,6 @@ function hexRgb(hex){
   return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
 
 }
-
 function applyColorGrade(){
 
   const g=colorState.grading;if(!g)return;
@@ -1100,7 +1120,6 @@ renderTool=function(name,el){
   renderToolV3(name,el);
 
 };
-
 function snapshot(){
 
   return JSON.stringify({
@@ -1114,7 +1133,6 @@ function snapshot(){
   });
 
 }
-
 function restore(s){
 
   const p=JSON.parse(s);
@@ -1152,7 +1170,6 @@ resetProject=function(){
 // HSL is exposed as a real non-destructive state. Browser canvas filter handles
 
 // global color controls; per-channel HSL values are retained for the next GPU shader stage.
-
 function hslStateActive(){
 
   return hslChannels.some(k=>Object.values(colorState.hsl[k]).some(v=>v!==0));
@@ -1166,6 +1183,6 @@ document.addEventListener('keydown',e=>{
 });
 
 openTool('adjust');
-</script>
+/script>
 
 </body> </html>

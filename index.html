@@ -1,6 +1,36 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Ava Pro — Photo Editor</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07080c;--panel:#101218;--panel2:#171a22;--panel3:#20242d;--line:#292e39;--text:#fff;--muted:#9299a8;--accent:#7657ff;--accent2:#9a84ff}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
+button,input,select{font:inherit}button{border:0;color:#fff;cursor:pointer}button:active{transform:scale(.98)}
+.app{height:100%;display:flex;flex-direction:column}
+.header{height:58px;flex:none;background:#0e1016;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:20}
+.brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:18px}.logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#6d50ff,#b59fff);box-shadow:0 8px 24px #7657ff55}
+.headBtns{display:flex;gap:6px;align-items:center}.icon{width:37px;height:37px;border-radius:9px;background:var(--panel2);font-size:17px}.export{background:var(--accent);padding:10px 15px;border-radius:9px;font-weight:800}
+.main{flex:1;min-height:0;display:flex}.workspace{flex:1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:#0b0d12;background-image:linear-gradient(45deg,#11141b 25%,transparent 25%),linear-gradient(-45deg,#11141b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#11141b 75%),linear-gradient(-45deg,transparent 75%,#11141b 75%);background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0}
+.empty{text-align:center;color:var(--muted);width:min(860px,calc(100% - 40px));padding:44px 28px;border:1px solid #242a3a;border-radius:28px;background:radial-gradient(circle at 50% 0%,#24185b55,transparent 46%),linear-gradient(145deg,#111522,#0b0e16);box-shadow:0 30px 100px #0008,inset 0 1px 0 #ffffff0d;position:relative;overflow:hidden}.empty:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 20%,#7657ff0b 50%,transparent 80%);pointer-events:none}.emptyIcon{width:88px;height:88px;border:1px solid #6f5cff66;border-radius:24px;background:linear-gradient(145deg,#21165a,#141827);display:grid;place-items:center;font-size:40px;margin:0 auto 18px;box-shadow:0 18px 50px #7657ff33}.empty h1{font-size:clamp(28px,4vw,46px);letter-spacing:-.03em;margin-bottom:10px;color:#fff}.empty h1 span{color:#9b84ff}.empty p{line-height:1.55;margin:0 auto 22px;max-width:650px;font-size:clamp(13px,1.7vw,17px);color:#9da5b8}.empty .uploadHint{font-size:11px;color:#727b90;margin-top:12px}.empty .formats{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:15px}.empty .formats span{padding:6px 10px;border:1px solid #2b3141;background:#151925;border-radius:999px;font-size:10px;color:#aeb5c5}.primary{background:linear-gradient(135deg,#7657ff,#5c3ff0);padding:14px 28px;border-radius:12px;font-weight:850;font-size:15px;box-shadow:0 12px 35px #7657ff40;transition:.18s}.primary:hover{transform:translateY(-1px);box-shadow:0 16px 42px #7657ff55}
+.stage{display:none;position:relative;align-items:center;justify-content:center;width:100%;height:100%;padding:18px}.canvasWrap{position:relative;max-width:100%;max-height:100%;box-shadow:0 24px 80px #000b}.canvasWrap canvas{display:block;max-width:100%;max-height:calc(100vh - 145px);touch-action:none;background:#fff}.selection{position:absolute;border:2px solid var(--accent);display:none;pointer-events:none}.selection .dot{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--accent)}.dot.tl{left:-7px;top:-7px}.dot.tr{right:-7px;top:-7px}.dot.bl{left:-7px;bottom:-7px}.dot.br{right:-7px;bottom:-7px}.rotateDot{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid var(--accent)}
+.compare{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:none;background:#11151ccc;border:1px solid var(--line);border-radius:11px;padding:5px;gap:5px;z-index:8}.compare button{background:transparent;padding:7px 11px;border-radius:8px;font-size:11px}.compare .on{background:var(--accent)}
+.sidebar{width:360px;flex:none;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}.sideTitle{height:48px;display:flex;align-items:center;padding:0 15px;border-bottom:1px solid var(--line);font-weight:800}
+.toolGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;max-height:190px;overflow:auto;flex:none}.tool{min-height:62px;border-radius:10px;background:var(--panel2);color:#cbd0da;font-size:10px;border:1px solid transparent}.tool b{display:block;font-size:20px;margin-bottom:4px}.tool.active{background:#211b3a;border-color:var(--accent);color:#fff}
+.panel{flex:1;min-height:0;overflow:auto;padding:14px}.title{font-weight:900;margin-bottom:14px}.sub{font-size:11px;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.08em}.row{margin-bottom:13px}.label{display:flex;justify-content:space-between;font-size:11px;color:#cbd0da;margin-bottom:7px}input[type=range]{width:100%;accent-color:var(--accent)}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.btn{padding:10px;background:var(--panel3);border-radius:8px;font-size:11px}.btn:hover{background:#2a2f3a}.field,.select{width:100%;background:var(--panel2);color:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;outline:none;margin-bottom:8px}.color{width:100%;height:38px;border:0;background:transparent}
+.preset{height:70px;border-radius:9px;background:var(--panel3);overflow:hidden;position:relative;font-size:10px}.presetPreview{height:45px;background:linear-gradient(135deg,#3a3a3a,#9b9b9b)}.preset span{display:block;padding:4px}.chips{display:flex;gap:6px;overflow:auto;padding-bottom:6px}.chip{white-space:nowrap;padding:7px 10px;border-radius:99px;background:var(--panel3);font-size:10px}.chip.active{background:var(--accent)}
+.stickers{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.sticker{height:48px;border-radius:9px;background:var(--panel3);font-size:23px}
+.layer{display:flex;align-items:center;gap:8px;background:var(--panel2);padding:9px;border-radius:8px;margin-bottom:6px;border:1px solid transparent}.layer.sel{border-color:var(--accent)}.layer .thumb{width:28px;text-align:center}.layer .name{flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.layer button{background:transparent;font-size:13px}
+.mobile{display:none}
+.modal{display:none;position:fixed;inset:0;background:#000b;z-index:100;align-items:center;justify-content:center;padding:18px}.modalBox{width:min(440px,100%);background:#171a21;border:1px solid var(--line);border-radius:16px;padding:20px}.modalBox h2{margin-bottom:16px}.modalActions{display:flex;gap:8px}.modalActions button{flex:1;padding:11px;border-radius:9px}.cancel{background:var(--panel3)}.confirm{background:var(--accent)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#171a21;border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:12px;z-index:200;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:850px){
+  .header{height:58px;padding:0 14px}.headBtns .icon{display:none}.export{padding:10px 15px;font-size:12px;border-radius:11px}.brand{font-size:17px}.main{flex-direction:column}.workspace{min-height:0;flex:1}.empty{width:calc(100% - 24px);padding:34px 18px;border-radius:24px}.emptyIcon{width:72px;height:72px;font-size:32px;border-radius:20px;margin-bottom:14px}.empty h1{font-size:30px}.empty p{font-size:14px;margin-bottom:20px}.primary{width:min(310px,100%);padding:14px 22px}.canvasWrap canvas{max-height:calc(100vh - 390px)}.sidebar{width:100%;height:315px;border-left:0;border-top:1px solid var(--line);background:#0e1016;box-shadow:0 -18px 50px #0008}.sideTitle{display:none}.toolGrid{grid-template-columns:repeat(8,66px);max-height:78px;overflow-x:auto;overflow-y:hidden;padding:8px 10px;background:#0e1016}.tool{min-height:58px;border-radius:12px;background:#151922}.tool b{font-size:18px}.panel{padding:12px;background:#101218}.mobile{display:none}.empty .formats{margin-top:13px}.empty .uploadHint{margin-top:10px}
+}
+</style> 
 
-<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"> <title>Ava Pro — Photo Editor</title> <style> *{box-sizing:border-box;margin:0;padding:0} :root{--bg:#07080c;--panel:#101218;--panel2:#171a22;--panel3:#20242d;--line:#292e39;--text:#fff;--muted:#9299a8;--accent:#7657ff;--accent2:#9a84ff} html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif} button,input,select{font:inherit}button{border:0;color:#fff;cursor:pointer}button:active{transform:scale(.98)} .app{height:100%;display:flex;flex-direction:column} .header{height:58px;flex:none;background:#0e1016;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:20} .brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:18px}.logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#6d50ff,#b59fff);box-shadow:0 8px 24px #7657ff55} .headBtns{display:flex;gap:6px;align-items:center}.icon{width:37px;height:37px;border-radius:9px;background:var(--panel2);font-size:17px}.export{background:var(--accent);padding:10px 15px;border-radius:9px;font-weight:800} .main{flex:1;min-height:0;display:flex}.workspace{flex:1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:#0b0d12;background-image:linear-gradient(45deg,#11141b 25%,transparent 25%),linear-gradient(-45deg,#11141b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#11141b 75%),linear-gradient(-45deg,transparent 75%,#11141b 75%);background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0} .empty{text-align:center;color:var(--muted);max-width:390px;padding:30px}.emptyIcon{width:92px;height:92px;border:1px solid var(--line);border-radius:26px;background:var(--panel2);display:grid;place-items:center;font-size:42px;margin:auto auto 18px}.empty h1{font-size:26px;margin-bottom:8px;color:#fff}.empty p{line-height:1.5;margin-bottom:18px}.primary{background:var(--accent);padding:13px 23px;border-radius:11px;font-weight:800} .stage{display:none;position:relative;align-items:center;justify-content:center;width:100%;height:100%;padding:18px}.canvasWrap{position:relative;max-width:100%;max-height:100%;box-shadow:0 24px 80px #000b}.canvasWrap canvas{display:block;max-width:100%;max-height:calc(100vh - 145px);touch-action:none;background:#fff}.selection{position:absolute;border:2px solid var(--accent);display:none;pointer-events:none}.selection .dot{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--accent)}.dot.tl{left:-7px;top:-7px}.dot.tr{right:-7px;top:-7px}.dot.bl{left:-7px;bottom:-7px}.dot.br{right:-7px;bottom:-7px}.rotateDot{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid var(--accent)} .compare{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:none;background:#11151ccc;border:1px solid var(--line);border-radius:11px;padding:5px;gap:5px;z-index:8}.compare button{background:transparent;padding:7px 11px;border-radius:8px;font-size:11px}.compare .on{background:var(--accent)} .sidebar{width:360px;flex:none;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}.sideTitle{height:48px;display:flex;align-items:center;padding:0 15px;border-bottom:1px solid var(--line);font-weight:800} .toolGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;max-height:190px;overflow:auto;flex:none}.tool{min-height:62px;border-radius:10px;background:var(--panel2);color:#cbd0da;font-size:10px;border:1px solid transparent}.tool b{display:block;font-size:20px;margin-bottom:4px}.tool.active{background:#211b3a;border-color:var(--accent);color:#fff} .panel{flex:1;min-height:0;overflow:auto;padding:14px}.title{font-weight:900;margin-bottom:14px}.sub{font-size:11px;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.08em}.row{margin-bottom:13px}.label{display:flex;justify-content:space-between;font-size:11px;color:#cbd0da;margin-bottom:7px}input[type=range]{width:100%;accent-color:var(--accent)}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.btn{padding:10px;background:var(--panel3);border-radius:8px;font-size:11px}.btn:hover{background:#2a2f3a}.field,.select{width:100%;background:var(--panel2);color:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;outline:none;margin-bottom:8px}.color{width:100%;height:38px;border:0;background:transparent} .preset{height:70px;border-radius:9px;background:var(--panel3);overflow:hidden;position:relative;font-size:10px}.presetPreview{height:45px;background:linear-gradient(135deg,#3a3a3a,#9b9b9b)}.preset span{display:block;padding:4px}.chips{display:flex;gap:6px;overflow:auto;padding-bottom:6px}.chip{white-space:nowrap;padding:7px 10px;border-radius:99px;background:var(--panel3);font-size:10px}.chip.active{background:var(--accent)} .stickers{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.sticker{height:48px;border-radius:9px;background:var(--panel3);font-size:23px} .layer{display:flex;align-items:center;gap:8px;background:var(--panel2);padding:9px;border-radius:8px;margin-bottom:6px;border:1px solid transparent}.layer.sel{border-color:var(--accent)}.layer .thumb{width:28px;text-align:center}.layer .name{flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.layer button{background:transparent;font-size:13px} .mobile{display:none} .modal{display:none;position:fixed;inset:0;background:#000b;z-index:100;align-items:center;justify-content:center;padding:18px}.modalBox{width:min(440px,100%);background:#171a21;border:1px solid var(--line);border-radius:16px;padding:20px}.modalBox h2{margin-bottom:16px}.modalActions{display:flex;gap:8px}.modalActions button{flex:1;padding:11px;border-radius:9px}.cancel{background:var(--panel3)}.confirm{background:var(--accent)} .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#171a21;border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:12px;z-index:200;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)} @media(max-width:850px){ .header{height:54px}.headBtns .icon{display:none}.export{padding:9px 12px;font-size:11px}.brand{font-size:16px}.main{flex-direction:column}.workspace{min-height:0}.canvasWrap canvas{max-height:calc(100vh - 405px)}.sidebar{width:100%;height:335px;border-left:0;border-top:1px solid var(--line)}.sideTitle{display:none}.toolGrid{grid-template-columns:repeat(8,64px);max-height:74px;overflow-x:auto;overflow-y:hidden}.tool{min-height:58px}.panel{padding:11px}.mobile{display:flex;height:60px;background:#0e1016;border-top:1px solid var(--line);overflow-x:auto;gap:6px;padding:6px}.mobile button{min-width:62px;background:var(--panel2);border-radius:8px;font-size:9px}.mobile b{display:block;font-size:17px;margin-bottom:2px} } </style> 
 <style id="ava-upgrade-css">
 .cropOverlay{display:none;position:absolute;inset:0;z-index:15;pointer-events:none}
 .cropOverlay.on{display:block}
@@ -43,736 +73,148 @@
 .curveBox canvas{width:100%;height:100%;display:block;max-width:none;max-height:none;background:transparent}
 .curveGrid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:25% 25%}
 .gradeWheel{width:100%;height:105px;display:flex;gap:7px}
-.gradeWheel button{flex:1;border-radius:9px;background:var(--panel3);font-size:10px}
+.gradeWheel button{flex:1;border-radius:99px;background:var(--panel3);font-size:10px}
 .gradeWheel input[type=color]{width:100%;height:45px;border:0;background:transparent}
 .smallValue{font-size:10px;color:var(--muted)}
 .colorReset{width:100%;margin-top:5px}
 </style>
-</head> <body> <div class="app"> <header class="header"> <div class="brand"><div class="logo">✦</div>Ava <small style="color:#9b8bff;font-size:9px">PRO</small></div> <div class="headBtns"> <button class="icon" onclick="undo()">↶</button><button class="icon" onclick="redo()">↷</button> <button class="icon" onclick="toggleCompare()">◐</button><button class="icon" onclick="resetProject()">⟳</button> <button class="export" onclick="openExport()">Export</button> </div> </header>
+</head> 
+<body> 
+<div class="app"> 
+  <header class="header"> 
+    <div class="brand"><div class="logo">✦</div>Ava <small style="color:#9b8bff;font-size:9px">PRO</small></div> 
+    <div class="headBtns"> 
+      <button class="icon" onclick="undo()">↶</button>
+      <button class="icon" onclick="redo()">↷</button> 
+      <button class="icon" onclick="toggleCompare()">◐</button>
+      <button class="icon" onclick="resetProject()">⟳</button> 
+      <button class="export" onclick="openExport()">Export</button> 
+    </div> 
+  </header>
 
-<main class="main"> <section class="workspace" id="workspace"> <div class="empty" id="empty"> <div class="emptyIcon">🖼️</div><h1>Ava Pro</h1> <p>Professional photo editing, creative effects, layers, stickers, typography and AI-ready tools.</p> <button class="primary" onclick="fileInput.click()">Choose Photo</button> </div> <div class="stage" id="stage"> <div class="canvasWrap" id="canvasWrap"> <canvas id="canvas"></canvas> 
+  <main class="main"> 
+    <section class="workspace" id="workspace"> 
+      <div class="empty" id="empty"> 
+        <div class="emptyIcon">🖼️</div>
+        <h1>Ava <span>Pro</span></h1> 
+        <p>Professional Photo Editing • Creative Effects • AI Tools</p> 
+        <label class="primary" for="fileInput" role="button" tabindex="0">＋ Choose Photo</label> 
+        <div class="uploadHint">Drag & drop your image here, or click to upload</div> 
+        <div class="formats"><span>JPG</span><span>PNG</span><span>WEBP</span><span>High Quality</span></div> 
+      </div> 
+      <div class="stage" id="stage"> 
+        <div class="canvasWrap" id="canvasWrap"> 
+          <canvas id="canvas"></canvas> 
+          <div class="transformOverlay" id="transformOverlay">
+            <div class="transformBox" id="transformBox">
+              <i class="th tl" data-handle="tl"></i>
+              <i class="th tr" data-handle="tr"></i>
+              <i class="th bl" data-handle="bl"></i>
+              <i class="th br" data-handle="br"></i>
+              <i class="transformLine"></i>
+              <i class="transformRotate" id="transformRotate"></i>
+            </div>
+            <div class="transformToolbar">
+              <button onclick="transformDuplicate()">Duplicate</button>
+              <button onclick="transformDelete()">Delete</button>
+              <button onclick="transformRotateBy(-90)">↺ 90°</button>
+              <button onclick="transformRotateBy(90)">↻ 90°</button>
+              <button onclick="transformFlipX()">↔ Flip</button>
+              <button onclick="transformReset()">Reset</button>
+            </div>
+          </div>
+          <div class="cropOverlay" id="cropOverlay">
+            <div class="cropBar">
+              <button onclick="setCropRatio('free')">Free</button>
+              <button onclick="setCropRatio('1:1')">1:1</button>
+              <button onclick="setCropRatio('4:5')">4:5</button>
+              <button onclick="setCropRatio('16:9')">16:9</button>
+              <button onclick="cancelCrop()">Cancel</button>
+              <button class="apply" onclick="applyCrop()">Apply Crop</button>
+            </div>
+            <div class="cropBox" id="cropBox">
+              <i class="cropHandle tl" data-corner="tl"></i>
+              <i class="cropHandle tr" data-corner="tr"></i>
+              <i class="cropHandle bl" data-corner="bl"></i>
+              <i class="cropHandle br" data-corner="br"></i>
+            </div>
+          </div>
+          <div class="selection" id="selection"> 
+            <i class="dot tl"></i><i class="dot tr"></i><i class="dot bl"></i><i class="dot br"></i><i class="rotateDot"></i> 
+          </div> 
+        </div> 
+      </div> 
+      <div class="compare" id="compare">
+        <button class="on" onclick="showEdited()">Edited</button>
+        <button onclick="showOriginal()">Original</button>
+      </div> 
+    </section>
 
-<div class="transformOverlay" id="transformOverlay">
-  <div class="transformBox" id="transformBox">
-    <i class="th tl" data-handle="tl"></i>
-    <i class="th tr" data-handle="tr"></i>
-    <i class="th bl" data-handle="bl"></i>
-    <i class="th br" data-handle="br"></i>
-    <i class="transformLine"></i>
-    <i class="transformRotate" id="transformRotate"></i>
-  </div>
-  <div class="transformToolbar">
-    <button onclick="transformDuplicate()">Duplicate</button>
-    <button onclick="transformDelete()">Delete</button>
-    <button onclick="transformRotateBy(-90)">↺ 90°</button>
-    <button onclick="transformRotateBy(90)">↻ 90°</button>
-    <button onclick="transformFlipX()">↔ Flip</button>
-    <button onclick="transformReset()">Reset</button>
-  </div>
+    <aside class="sidebar"> 
+      <div class="sideTitle">Professional Tools</div> 
+      <div class="toolGrid" id="toolGrid"> 
+        <button class="tool active" onclick="openTool('adjust',this)"><b>☀️</b>Light</button> 
+        <button class="tool" onclick="openTool('color',this)"><b>🎨</b>Color Studio</button> 
+        <button class="tool" onclick="openTool('filters',this)"><b>🖼️</b>Filters</button> 
+        <button class="tool" onclick="openTool('effects',this)"><b>✨</b>Effects</button> 
+        <button class="tool" onclick="openTool('retouch',this)"><b>🩹</b>Retouch</button> 
+        <button class="tool" onclick="openTool('crop',this)"><b>✂️</b>Crop</button> 
+        <button class="tool" onclick="openTool('text',this)"><b>🔤</b>Text</button> 
+        <button class="tool" onclick="openTool('stickers',this)"><b>😊</b>Stickers</button> 
+        <button class="tool" onclick="openTool('shapes',this)"><b>◇</b>Shapes</button> 
+        <button class="tool" onclick="openTool('draw',this)"><b>🖌️</b>Draw</button> 
+        <button class="tool" onclick="openTool('overlay',this)"><b>▧</b>Overlay</button> 
+        <button class="tool" onclick="openTool('frames',this)"><b>▣</b>Frames</button> 
+        <button class="tool" onclick="openTool('ai',this)"><b>🤖</b>AI</button> 
+        <button class="tool" onclick="openTool('collage',this)"><b>▦</b>Collage</button> 
+        <button class="tool" onclick="openTool('layers',this)"><b>▱</b>Layers</button> 
+        <button class="tool" onclick="openTool('social',this)"><b>📱</b>Social</button> 
+      </div>
+      <div class="panel" id="panel"></div> 
+    </aside> 
+  </main>
+
+  <div class="mobile"> 
+    <button onclick="openTool('adjust')"><b>☀️</b>Light</button>
+    <button onclick="openTool('color')"><b>🎨</b>Color Studio</button>
+    <button onclick="openTool('filters')"><b>🖼️</b>Filters</button>
+    <button onclick="openTool('effects')"><b>✨</b>Effects</button>
+    <button onclick="openTool('text')"><b>🔤</b>Text</button>
+    <button onclick="openTool('stickers')"><b>😊</b>Sticker</button>
+    <button onclick="openTool('retouch')"><b>🩹</b>Retouch</button>
+    <button onclick="openTool('ai')"><b>🤖</b>AI</button> 
+  </div> 
 </div>
-<div class="cropOverlay" id="cropOverlay">
-  <div class="cropBar">
-    <button onclick="setCropRatio('free')">Free</button>
-    <button onclick="setCropRatio('1:1')">1:1</button>
-    <button onclick="setCropRatio('4:5')">4:5</button>
-    <button onclick="setCropRatio('16:9')">16:9</button>
-    <button onclick="cancelCrop()">Cancel</button>
-    <button class="apply" onclick="applyCrop()">Apply Crop</button>
-  </div>
-  <div class="cropBox" id="cropBox">
-    <i class="cropHandle tl" data-corner="tl"></i>
-    <i class="cropHandle tr" data-corner="tr"></i>
-    <i class="cropHandle bl" data-corner="bl"></i>
-    <i class="cropHandle br" data-corner="br"></i>
-  </div>
-</div>
-<div class="selection" id="selection"> <i class="dot tl"></i><i class="dot tr"></i><i class="dot bl"></i><i class="dot br"></i><i class="rotateDot"></i> </div> </div> </div> <div class="compare" id="compare"><button class="on" onclick="showEdited()">Edited</button><button onclick="showOriginal()">Original</button></div> </section>
-
-<aside class="sidebar"> <div class="sideTitle">Professional Tools</div> <div class="toolGrid" id="toolGrid"> <button class="tool active" onclick="openTool('adjust',this)"><b>☀️</b>Light</button> <button class="tool" onclick="openTool('color',this)"><b>🎨</b>Color Studio</button> <button class="tool" onclick="openTool('filters',this)"><b>🖼️</b>Filters</button> <button class="tool" onclick="openTool('effects',this)"><b>✨</b>Effects</button> <button class="tool" onclick="openTool('retouch',this)"><b>🩹</b>Retouch</button> <button class="tool" onclick="openTool('crop',this)"><b>✂️</b>Crop</button> <button class="tool" onclick="openTool('text',this)"><b>🔤</b>Text</button> <button class="tool" onclick="openTool('stickers',this)"><b>😊</b>Stickers</button> <button class="tool" onclick="openTool('shapes',this)"><b>◇</b>Shapes</button> <button class="tool" onclick="openTool('draw',this)"><b>🖌️</b>Draw</button> <button class="tool" onclick="openTool('overlay',this)"><b>▧</b>Overlay</button> <button class="tool" onclick="openTool('frames',this)"><b>▣</b>Frames</button> <button class="tool" onclick="openTool('ai',this)"><b>🤖</b>AI</button> <button class="tool" onclick="openTool('collage',this)"><b>▦</b>Collage</button> <button class="tool" onclick="openTool('layers',this)"><b>▱</b>Layers</button> <button class="tool" onclick="openTool('social',this)"><b>📱</b>Social</button> </div>
-
-<div class="panel" id="panel"></div> </aside> </main>
-
-<div class="mobile"> <button onclick="openTool('adjust')"><b>☀️</b>Light</button><button onclick="openTool('color')"><b>🎨</b>Color Studio</button><button onclick="openTool('filters')"><b>🖼️</b>Filters</button><button onclick="openTool('effects')"><b>✨</b>Effects</button><button onclick="openTool('text')"><b>🔤</b>Text</button><button onclick="openTool('stickers')"><b>😊</b>Sticker</button><button onclick="openTool('retouch')"><b>🩹</b>Retouch</button><button onclick="openTool('ai')"><b>🤖</b>AI</button> </div> </div>
 
 <input id="fileInput" type="file" accept="image/*" hidden>
 
-<div class="modal" id="exportModal"><div class="modalBox"> <h2>Export Ava Photo</h2> <div class="row"><div class="label">Format</div><select id="format" class="select"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></div> <div class="row"><div class="label">Quality <span id="qualityValue">92%</span></div><input id="quality" type="range" min="10" max="100" value="92"></div> <div class="modalActions"><button class="cancel" onclick="closeExport()">Cancel</button><button class="confirm" onclick="exportImage()">Save Photo</button></div> </div></div> <div class="toast" id="toast"></div>
+<div class="modal" id="exportModal">
+  <div class="modalBox"> 
+    <h2>Export Ava Photo</h2> 
+    <div class="row">
+      <div class="label">Format</div>
+      <select id="format" class="select">
+        <option value="image/jpeg">JPG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WEBP</option>
+      </select>
+    </div> 
+    <div class="row">
+      <div class="label">Quality <span id="qualityValue">92%</span></div>
+      <input id="quality" type="range" min="10" max="100" value="92">
+    </div> 
+    <div class="modalActions">
+      <button class="cancel" onclick="closeExport()">Cancel</button>
+      <button class="confirm" onclick="exportImage()">Save Photo</button>
+    </div> 
+  </div>
+</div> 
+<div class="toast" id="toast"></div>
 
-<script> const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'); const empty=document.getElementById('empty'),stage=document.getElementById('stage'),wrap=document.getElementById('canvasWrap'); const selection=document.getElementById('selection'),fileInput=document.getElementById('fileInput'),panel=document.getElementById('panel'); let image=new Image(), originalSrc='', projectLoaded=false, selectedId=null, compareOriginal=false; let base={brightness:0,contrast:0,saturation:0,exposure:0,temperature:0,tint:0,highlights:0,shadows:0,whites:0,blacks:0,vibrance:0,clarity:0,sharpness:0,fade:0,grain:0,vignette:0}; let filter='none', rotation=0, flipX=1, flipY=1, frame='none', objects=[], history=[], future=[]; const toolNames=['adjust','color','filters','effects','retouch','crop','text','stickers','shapes','draw','overlay','frames','ai','collage','layers','social']; const presets=[ ['Original','none'],['Vivid','saturate(1.45) contrast(1.08)'],['Cinema','contrast(1.18) saturate(.88)'],['Warm','sepia(.18) saturate(1.18)'],['Cool','hue-rotate(12deg) saturate(.9)'],['B&W','grayscale(1) contrast(1.1)'],['Noir','grayscale(1) contrast(1.35) brightness(.9)'],['Vintage','sepia(.45) contrast(1.05)'],['Fade','contrast(.9) brightness(1.06) saturate(.8)'],['Drama','grayscale(.55) contrast(1.45)'],['Glow','brightness(1.08) saturate(1.15) contrast(1.05)'],['HDR','contrast(1.32) saturate(1.3)'],['Retro','sepia(.25) saturate(1.3) contrast(1.08)'],['Dream','brightness(1.12) contrast(.9) saturate(1.12) blur(.2px)'],['Film','contrast(1.12) saturate(.92) sepia(.08)'],['Pop','saturate(1.8) contrast(1.12)'],['Matte','contrast(.9) saturate(.75) brightness(1.04)'],['Night','brightness(.78) contrast(1.25) saturate(.85)'],['Golden','sepia(.3) saturate(1.45) brightness(1.05)'],['Frost','hue-rotate(18deg) saturate(.7) brightness(1.08)'] ]; const effectPresets=[ ['Bloom','brightness(1.08) saturate(1.15) blur(.35px)'],['Soft Focus','blur(1px) brightness(1.04) contrast(.94)'],['Neon','saturate(2) contrast(1.3)'],['Glitch','contrast(1.3) saturate(1.7)'],['VHS','contrast(.95) saturate(.85) sepia(.08)'],['Prism','hue-rotate(25deg) saturate(1.3)'],['Color Pop','saturate(2.1) contrast(1.08)'],['Dark Mood','brightness(.82) contrast(1.25) saturate(.9)'],['Sunset','sepia(.24) saturate(1.55) brightness(1.03)'],['Paper','grayscale(.18) contrast(.96) sepia(.15)'],['Halftone','contrast(1.35) saturate(.9)'],['Dream Glow','brightness(1.1) contrast(.88) saturate(1.18) blur(.55px)'] ]; const stickers={ Popular:['❤️','🔥','⭐','✨','😍','😂','😎','🎉','💯','👑'], Love:['💕','💖','💘','💋','🌹','🫶','💞','💓','🥰','💍'], Travel:['✈️','🌴','🏝️','🗺️','📍','🚗','🎒','⛺','🌊','🗿'], Food:['🍕','🍔','🍟','🍰','☕','🍓','🍩','🍜','🍦','🥤'], Nature:['🌸','🌻','🦋','🌈','🌿','🌙','☀️','🍃','🌺','🌲'], Social:['LIKE','FOLLOW','NEW','SALE','WOW','OMG','SUBSCRIBE','LOVE','VLOG','2026'], Decor:['✦','✧','★','☆','❀','❖','➜','♥','☁️','⚡'] }; function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.classList.remove('show'),1600)} function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))} function openTool(name,button){ toolNames.forEach(n=>document.getElementById('tool-'+n)?.remove()); document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active')); if(button)button.classList.add('active'); const el=document.createElement('div');el.id='tool-'+name;panel.appendChild(el); renderTool(name,el); } function section(title,body){return \`<div class="title">${title}</div>${body}\`} function slider(id,label,min,max,val,step=1){return \`<div class="row"><div class="label">${label}<span id="${id}Val">${val}</span></div><input id="${id}" type="range" min="${min}" max="${max}" value="${val}" step="${step}"></div>\`} function bindSlider(id,key){const x=document.getElementById(id);if(!x)return;x.value=base[key]??0;x.oninput=()=>{base[key]=Number(x.value);document.getElementById(id+'Val').textContent=x.value;render()};x.onchange=commit} function commit(){history.push(snapshot());if(history.length>40)history.shift();future=[]} function snapshot(){return JSON.stringify({base,filter,rotation,flipX,flipY,frame,objects:objects.map(o=>({...o,visible:o.visible!==false,locked:!!o.locked,opacity:o.opacity??1,blend:o.blend||'source-over',flipX:o.flipX||1,flipY:o.flipY||1}))})} function restore(s){const p=JSON.parse(s);base=p.base;filter=p.filter;rotation=p.rotation;flipX=p.flipX;flipY=p.flipY;frame=p.frame;objects=p.objects;selectedId=null;render();refreshLayers()} function undo(){if(!history.length)return;future.push(snapshot());restore(history.pop())} function redo(){if(!future.length)return;history.push(snapshot());restore(future.pop())} function renderTool(name,el){ if(name==='adjust')el.innerHTML=section('Light & Detail', slider('brightness','Brightness',-100,100,0)+slider('contrast','Contrast',-100,100,0)+slider('exposure','Exposure',-100,100,0)+slider('highlights','Highlights',-100,100,0)+slider('shadows','Shadows',-100,100,0)+slider('whites','Whites',-100,100,0)+slider('blacks','Blacks',-100,100,0)+slider('clarity','Clarity',-100,100,0)+slider('sharpness','Sharpness',0,100,0)+slider('fade','Fade',0,100,0)+slider('grain','Grain',0,100,0)+slider('vignette','Vignette',0,100,0)+\`<div class="grid2"><button class="btn" onclick="autoEnhance()">✨ Auto Enhance</button><button class="btn" onclick="resetAdjust()">Reset</button></div>\`); ['brightness','contrast','exposure','highlights','shadows','whites','blacks','clarity','sharpness','fade','grain','vignette'].forEach(k=>bindSlider(k,k)); else if(name==='color')el.innerHTML=section('Color Studio', slider('saturation','Saturation',-100,100,0)+slider('vibrance','Vibrance',-100,100,0)+slider('temperature','Temperature',-100,100,0)+slider('tint','Tint',-100,100,0)+\`<div class="sub">HSL / Color Mix</div><div class="chips">${['Red','Orange','Yellow','Green','Cyan','Blue','Purple','Magenta'].map(x=>\`<button class="chip" onclick="toast('${x} mixer ready')">${x}</button>\`).join('')}</div><p style="color:var(--muted);font-size:11px;line-height:1.5;margin-top:10px">Advanced per-color masking is prepared for the next rendering-engine stage.</p>\`); ['saturation','vibrance','temperature','tint'].forEach(k=>bindSlider(k,k)); else if(name==='filters')el.innerHTML=section('Professional Presets',\`<div class="chips">${['All','Cinematic','Film','Vintage','Portrait','B&W'].map((x,i)=>\`<button class="chip ${i?'':'active'}">${x}</button>\`).join('')}</div><div class="grid3" style="margin-top:10px">${presets.map((p,i)=>\`<button class="preset" onclick="setFilter(${JSON.stringify(p[1])})"><div class="presetPreview" style="filter:${p[1]}"></div><span>${p[0]}</span></button>\`).join('')}</div>\`); else if(name==='effects')el.innerHTML=section('Creative Effects',\`<div class="chips">${['Light','Blur','Cinematic','Glitch','Texture','Dream'].map(x=>\`<button class="chip">${x}</button>\`).join('')}</div><div class="grid3" style="margin-top:10px">${effectPresets.map(p=>\`<button class="preset" onclick="setFilter(${JSON.stringify(p[1])})"><div class="presetPreview" style="filter:${p[1]}"></div><span>${p[0]}</span></button>\`).join('')}</div><div class="sub">Extra controls</div>${slider('effectIntensity','Intensity',0,100,100)}\`); else if(name==='retouch')el.innerHTML=section('Retouch',\`<div class="grid2">${['Healing','Clone','Blemish','Whiten','Smooth','Sharpen','Dodge','Burn','Red Eye','Object Remove'].map(x=>\`<button class="btn" onclick="toast('${x} tool selected')">${x}</button>\`).join('')}</div><div class="sub">Portrait</div>${slider('skin','Skin Smooth',0,100,0)}${slider('eyes','Eye Enhance',0,100,0)}${slider('teeth','Teeth White',0,100,0)}\`); else if(name==='crop')el.innerHTML=section('Crop & Geometry',\`<div class="grid3">${['Free','1:1','4:5','3:4','4:3','16:9','9:16','3:2','2:3'].map(x=>\`<button class="btn" onclick="cropAspect('${x}')">${x}</button>\`).join('')}</div><div class="sub">Transform</div><div class="grid2"><button class="btn" onclick="rotate(-90)">↺ Rotate</button><button class="btn" onclick="rotate(90)">↻ Rotate</button><button class="btn" onclick="flip()">↔ Flip</button><button class="btn" onclick="toast('Perspective grid ready')">Perspective</button></div>\`); else if(name==='text')el.innerHTML=section('Typography Studio',\`<input id="textInput" class="field" placeholder="Write your text"><select id="font" class="select"><option>Arial</option><option>Georgia</option><option>Impact</option><option>Trebuchet MS</option><option>Courier New</option><option>Times New Roman</option></select>${slider('textSize','Size',12,220,64)}<div class="grid2"><input id="textColor" class="color" type="color" value="#ffffff"><input id="textBg" class="color" type="color" value="#000000"></div><div class="sub">Style</div><div class="grid2"><button class="btn" onclick="addText('fill')">Add Text</button><button class="btn" onclick="addText('outline')">Outline Text</button><button class="btn" onclick="addText('glow')">Glow Text</button><button class="btn" onclick="addText('label')">Label Text</button></div><p style="font-size:10px;color:var(--muted);margin-top:10px">Added text stays editable as a layer: move, scale, rotate, duplicate or delete.</p>\`); else if(name==='stickers')renderStickerTool(el); else if(name==='shapes')el.innerHTML=section('Shapes',\`<div class="grid3">${['●','■','◆','★','♥','➜','☁','✦','✚','▬','○','◇'].map(x=>\`<button class="sticker" onclick="addSticker('${x}')">${x}</button>\`).join('')}</div><div class="sub">Custom</div><button class="btn" style="width:100%" onclick="toast('Custom SVG/PNG shapes can be added here')">＋ Add Shape</button>\`); else if(name==='draw')el.innerHTML=section('Drawing',slider('brush','Brush Size',1,80,8)+\`<input id="brushColor" class="color" type="color" value="#ffffff"><div class="grid2"><button class="btn" onclick="toggleDraw()">🖌️ Draw</button><button class="btn" onclick="toast('Eraser mode ready')">Eraser</button><button class="btn" onclick="toast('Neon brush ready')">Neon</button><button class="btn" onclick="toast('Airbrush ready')">Airbrush</button></div>\`); else if(name==='overlay')el.innerHTML=section('Overlays & Double Exposure',\`<div class="grid2"><button class="btn" onclick="fileInput.dataset.mode='overlay';fileInput.click()">＋ Add Photo</button><button class="btn" onclick="toast('Double exposure mode')">Double Exposure</button><button class="btn" onclick="toast('Light leak overlay')">Light Leak</button><button class="btn" onclick="toast('Film dust overlay')">Film Dust</button></div><div class="sub">Blend</div>${slider('opacity','Opacity',0,100,100)}\`); else if(name==='frames')el.innerHTML=section('Frames',\`<div class="grid3">${[['none','None'],['white','White'],['black','Black'],['gold','Gold'],['purple','Purple'],['red','Red'],['film','Film'],['shadow','Shadow'],['double','Double']].map(x=>\`<button class="btn" onclick="setFrame('${x[0]}')">${x[1]}</button>\`).join('')}</div>\`); else if(name==='ai')el.innerHTML=section('AI Studio',\`<div class="grid2">${['🪄 Background Remover','✨ AI Enhance','🧹 Object Remover','🔍 AI Upscale','🌄 AI Background','💡 AI Relight','👤 AI Portrait','🎨 AI Style','↔ AI Expand','🧼 AI Clean Up'].map(x=>\`<button class="btn" onclick="aiTool('${x.replace(/^\\\S+\\\s/,'')}')">${x}</button>\`).join('')}</div><div class="sub">AI Prompt</div><input id="aiPrompt" class="field" placeholder="Describe what you want to change..."><button class="btn" style="width:100%;background:var(--accent)" onclick="runPrompt()">✨ Apply AI Prompt</button><p style="font-size:10px;color:var(--muted);margin-top:10px">This interface is ready to connect to your AI backend/API. The browser editor itself does not invent AI results without a connected model.</p>\`); else if(name==='collage')el.innerHTML=section('Collage Studio',\`<div class="grid2">${['2 Photos','3 Photos','4 Photos','6 Photos','9 Grid','Freestyle','Magazine','Polaroid'].map(x=>\`<button class="btn" onclick="toast('${x} layout selected')">${x}</button>\`).join('')}</div><div class="sub">Social sizes</div><div class="grid2">${['Instagram 1:1','Story 9:16','YouTube 16:9','WhatsApp Status'].map(x=>\`<button class="btn" onclick="toast('${x}')">${x}</button>\`).join('')}</div>\`); else if(name==='layers')el.innerHTML=section('Layers',\`<div id="layers"></div><div class="grid2"><button class="btn" onclick="duplicateSelected()">Duplicate</button><button class="btn" onclick="deleteSelected()">Delete</button><button class="btn" onclick="moveLayer(-1)">Move Up</button><button class="btn" onclick="moveLayer(1)">Move Down</button></div>\`); else if(name==='social')el.innerHTML=section('Social Canvas',\`<div class="grid2">${['Instagram Post','Instagram Story','YouTube Thumbnail','YouTube Banner','WhatsApp Status','Facebook Post','Pinterest','Custom'].map(x=>\`<button class="btn" onclick="toast('${x} preset')">${x}</button>\`).join('')}</div><div class="sub">Export</div><p style="font-size:11px;color:var(--muted);line-height:1.5">Use Export to choose JPG, PNG or WEBP and quality. High-resolution output uses the full project canvas.</p>\`); if(name==='layers')refreshLayers(); } function renderStickerTool(el){ let cats=Object.keys(stickers); el.innerHTML=section('Sticker Studio',\`<div class="chips">${cats.map((c,i)=>\`<button class="chip ${i?'':'active'}" onclick="showStickerCat('${c}')">${c}</button>\`).join('')}</div><div id="stickerArea" class="stickers" style="margin-top:10px"></div><div class="sub">Your sticker</div><button class="btn" style="width:100%" onclick="fileInput.dataset.mode='sticker';fileInput.click()">＋ Create Sticker From Photo</button>\`); showStickerCat(cats[0]); } function showStickerCat(cat){const a=document.getElementById('stickerArea');if(!a)return;a.innerHTML=stickers[cat].map(s=>\`<button class="sticker" onclick="addSticker(${JSON.stringify(s)})">${esc(s)}</button>\`).join('')} function setFilter(v){filter=v;render();commit()} function rotate(d){rotation=(rotation+d)%360;render();commit()} function flip(){flipX*=-1;render();commit()} function setFrame(v){frame=v;render();commit()} function resetAdjust(){Object.keys(base).forEach(k=>base[k]=0);render();commit();openTool('adjust')} function autoEnhance(){base.brightness=8;base.contrast=10;base.saturation=12;base.shadows=8;base.highlights=-6;base.clarity=12;render();commit();toast('Auto Enhance applied')} function resetProject(){if(!projectLoaded)return;rotation=0;flipX=flipY=1;filter='none';frame='none';Object.keys(base).forEach(k=>base[k]=0);objects=[];selectedId=null;render();commit();refreshLayers();toast('Project reset')} function newId(){return Math.random().toString(36).slice(2,10)} function addText(style='fill'){ if(!projectLoaded)return toast('Upload a photo first'); const text=document.getElementById('textInput')?.value.trim();if(!text)return toast('Enter text first'); objects.push({id:newId(),type:'text',text,font:document.getElementById('font').value,size:Number(document.getElementById('textSize').value),color:document.getElementById('textColor').value,bg:document.getElementById('textBg').value,style,x:canvas.width/2,y:canvas.height/2,scale:1,rotation:0,opacity:1}); selectedId=objects.at(-1).id;render();commit();refreshLayers() } function addSticker(text){ if(!projectLoaded)return toast('Upload a photo first'); objects.push({id:newId(),type:'sticker',text:String(text),font:'Arial',size:String(text).length>3?46:100,color:'#fff',x:canvas.width/2,y:canvas.height/2,scale:1,rotation:0,opacity:1}); selectedId=objects.at(-1).id;render();commit();refreshLayers() } function refreshLayers(){ const box=document.getElementById('layers');if(!box)return; box.innerHTML=\`<div class="layer ${selectedId==='photo'?'sel':''}" onclick="selectLayer('photo')"><div class="thumb">🖼️</div><div class="name">Photo</div></div>\`+ objects.slice().reverse().map(o=>\`<div class="layer ${selectedId===o.id?'sel':''}" onclick="selectLayer('${o.id}')"><div class="thumb">${o.type==='text'?'🔤':'😊'}</div><div class="name">${esc(o.text||o.type)}</div><button onclick="event.stopPropagation();deleteLayer('${o.id}')">🗑️</button></div>\`).join('') } function selectLayer(id){selectedId=id;refreshLayers();updateSelection()} function deleteLayer(id){objects=objects.filter(o=>o.id!==id);if(selectedId===id)selectedId=null;render();commit();refreshLayers()} function deleteSelected(){if(selectedId&&selectedId!=='photo')deleteLayer(selectedId)} function duplicateSelected(){const o=objects.find(x=>x.id===selectedId);if(!o)return;const n={...o,id:newId(),x:o.x+30,y:o.y+30};objects.push(n);selectedId=n.id;render();commit();refreshLayers()} function moveLayer(dir){const i=objects.findIndex(o=>o.id===selectedId);if(i<0)return;const j=i+dir;if(j<0||j>=objects.length)return;[objects[i],objects[j]]=[objects[j],objects[i]];render();commit();refreshLayers()} function aiTool(n){toast(n+' requires your AI API connection');} function runPrompt(){const p=document.getElementById('aiPrompt')?.value.trim();toast(p?\`AI request prepared: ${p}\`:'Describe an edit first')} function cropAspect(r){toast(\`Crop ${r} selected — drag/crop engine can be connected next\`)} function toggleDraw(){drawing=!drawing;toast(drawing?'Drawing enabled':'Drawing disabled')} function toggleCompare(){document.getElementById('compare').style.display='flex'} function showEdited(){compareOriginal=false;render()} function showOriginal(){if(!originalSrc)return;compareOriginal=true;const im=new Image();im.onload=()=>{canvas.width=im.naturalWidth;canvas.height=im.naturalHeight;ctx.filter='none';ctx.drawImage(im,0,0)};im.src=originalSrc} function openExport(){if(!projectLoaded)return toast('Upload a photo first');document.getElementById('exportModal').style.display='flex'} function closeExport(){document.getElementById('exportModal').style.display='none'} document.getElementById('quality').oninput=e=>document.getElementById('qualityValue').textContent=e.target.value+'%' function exportImage(){const f=document.getElementById('format').value,q=Number(document.getElementById('quality').value)/100,a=document.createElement('a');a.download='pixora-pro.'+(f==='image/png'?'png':f==='image/webp'?'webp':'jpg');a.href=canvas.toDataURL(f,q);a.click();closeExport();toast('Photo exported')} function buildFilter(){let b=100+base.brightness;let c=100+base.contrast;let s=100+base.saturation;let e=Math.pow(2,base.exposure/100);let blur=Math.max(0,Math.abs(base.clarity<0?base.clarity/50:0));let parts=[\`brightness(${b*e}%)\`,\`contrast(${c}%)\`,\`saturate(${Math.max(0,s+base.vibrance)}%)\`,\`blur(${blur}px)\`];if(base.temperature>0)parts.push(\`sepia(${base.temperature/450})\`);if(base.temperature<0)parts.push(\`hue-rotate(${base.temperature/3}deg)\`);if(base.tint)parts.push(\`hue-rotate(${base.tint/4}deg)\`);if(base.fade)parts.push(\`opacity(${1-base.fade/220})\`);if(filter!=='none')parts.push(filter);return parts.join(' ')} function render(){ if(!projectLoaded||compareOriginal)return; const a=((rotation%360)+360)%360,rot=a===90||a===270; canvas.width=rot?image.naturalHeight:image.naturalWidth;canvas.height=rot?image.naturalWidth:image.naturalHeight; ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(rotation*Math.PI/180);ctx.scale(flipX,flipY);ctx.filter=buildFilter();ctx.drawImage(image,-image.naturalWidth/2,-image.naturalHeight/2);ctx.restore(); drawCreative();drawObjects();applyFrame();updateSelection(); } function drawCreative(){ if(base.vignette>0){const g=ctx.createRadialGradient(canvas.width/2,canvas.height/2,Math.min(canvas.width,canvas.height)*.18,canvas.width/2,canvas.height/2,Math.max(canvas.width,canvas.height)*.72);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,\`rgba(0,0,0,${base.vignette/100})\`);ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height)} if(base.grain>0){ctx.save();ctx.globalAlpha=base.grain/300;for(let i=0;i<Math.min(12000,canvas.width*canvas.height/10);i++){ctx.fillStyle=Math.random()>.5?'#fff':'#000';ctx.fillRect(Math.random()*canvas.width,Math.random()*canvas.height,1,1)}ctx.restore()} } function drawObjects(){ objects.forEach(o=>{ctx.save();ctx.globalAlpha=o.opacity??1;ctx.translate(o.x,o.y);ctx.rotate((o.rotation||0)*Math.PI/180);ctx.scale(o.scale||1,o.scale||1); if(o.type==='text'){ctx.font=\`700 ${o.size}px ${o.font}\`;ctx.textAlign='center';ctx.textBaseline='middle';if(o.style==='outline'){ctx.lineWidth=Math.max(2,o.size/18);ctx.strokeStyle=o.color;ctx.strokeText(o.text,0,0)}else{if(o.style==='label'){const m=ctx.measureText(o.text);ctx.fillStyle=o.bg+'dd';ctx.fillRect(-m.width/2-o.size*.18,-o.size*.65,m.width+o.size*.36,o.size*1.25)}ctx.fillStyle=o.color;if(o.style==='glow'){ctx.shadowColor=o.color;ctx.shadowBlur=o.size*.28}ctx.fillText(o.text,0,0)}}else{ctx.font=\`${o.size}px Arial\`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.25)';ctx.shadowBlur=5;ctx.fillStyle=o.color||'#fff';ctx.fillText(o.text,0,0)}ctx.restore()}) } function applyFrame(){if(frame==='none')return;const s=Math.max(10,Math.min(canvas.width,canvas.height)*.025);ctx.save();ctx.lineWidth=s;if(frame==='white')ctx.strokeStyle='#fff';else if(frame==='black')ctx.strokeStyle='#000';else if(frame==='gold')ctx.strokeStyle='#c79d4b';else if(frame==='purple')ctx.strokeStyle='#7657ff';else if(frame==='red')ctx.strokeStyle='#e76d6d';else if(frame==='film')ctx.strokeStyle='#111';else if(frame==='shadow'){ctx.shadowColor='#000';ctx.shadowBlur=s*2;ctx.strokeStyle='#fff'}else if(frame==='double')ctx.strokeStyle='#fff';ctx.strokeRect(s/2,s/2,canvas.width-s,canvas.height-s);if(frame==='double'){ctx.lineWidth=s*.35;ctx.strokeStyle='#000';ctx.strokeRect(s*1.4,s*1.4,canvas.width-s*2.8,canvas.height-s*2.8)}ctx.restore()} function updateSelection(){ const o=objects.find(x=>x.id===selectedId);if(!o){selection.style.display='none';return} const sx=canvas.getBoundingClientRect(),cr=wrap.getBoundingClientRect();let w=Math.max(40,(o.type==='text'?o.size*o.text.length*.55:o.size)*Math.abs(o.scale||1));let h=o.size*1.25*Math.abs(o.scale||1);selection.style.display='block';selection.style.width=w*(sx.width/canvas.width)+'px';selection.style.height=h*(sx.height/canvas.height)+'px';selection.style.left=(o.x/canvas.width*sx.width-w*sx.width/canvas.width/2)+'px';selection.style.top=(o.y/canvas.height*sx.height-h*sx.height/canvas.height/2)+'px';selection.style.transform=\`rotate(${o.rotation||0}deg)\`} let drawing=false,drawingActive=false; canvas.addEventListener('pointerdown',e=>{if(drawing){drawingActive=true;const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y);return}const p=point(e);let hit=null;for(let i=objects.length-1;i>=0;i--){const o=objects[i],r=(o.size||80)*(o.scale||1);if(Math.abs(p.x-o.x)<r&&Math.abs(p.y-o.y)<r){hit=o;break}}if(hit){selectedId=hit.id;refreshLayers();drag={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};canvas.setPointerCapture(e.pointerId);updateSelection()}}); canvas.addEventListener('pointermove',e=>{if(drawing&&drawingActive){const p=point(e);ctx.lineWidth=Number(document.getElementById('brush')?.value||8);ctx.lineCap='round';ctx.strokeStyle=document.getElementById('brushColor')?.value||'#fff';ctx.lineTo(p.x,p.y);ctx.stroke();return}if(drag){const p=point(e),o=objects.find(x=>x.id===drag.id);if(o){o.x=p.x-drag.dx;o.y=p.y-drag.dy;render()}}}); canvas.addEventListener('pointerup',()=>{if(drawing&&drawingActive){drawingActive=false;commit();return}if(drag){drag=null;commit();refreshLayers()}}); let drag=null; function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}} fileInput.addEventListener('change',e=>{ const f=e.target.files[0];if(!f)return;const mode=fileInput.dataset.mode||'photo';fileInput.dataset.mode='photo'; const reader=new FileReader();reader.onload=ev=>{if(mode==='photo'){originalSrc=ev.target.result;image=new Image();image.onload=()=>{projectLoaded=true;empty.style.display='none';stage.style.display='flex';base={brightness:0,contrast:0,saturation:0,exposure:0,temperature:0,tint:0,highlights:0,shadows:0,whites:0,blacks:0,vibrance:0,clarity:0,sharpness:0,fade:0,grain:0,vignette:0};filter='none';rotation=0;flipX=flipY=1;objects=[];history=[];future=[];render();commit();
-// ===== Ava Pro Professional Editing Core Upgrade =====
-let cropState = {active:false, ratio:'free', x:0, y:0, w:0, h:0};
-let cropDrag = null;
-
-function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
-
-function canvasPixelsToCss(){
-  const r=canvas.getBoundingClientRect();
-  return {sx:r.width/canvas.width, sy:r.height/canvas.height};
-}
-
-function startCrop(){
-  if(!projectLoaded) return toast('Upload a photo first');
-  const overlay=document.getElementById('cropOverlay');
-  const box=document.getElementById('cropBox');
-  cropState.active=true;
-  cropState.ratio='free';
-  const pad=.08;
-  cropState.x=canvas.width*pad; cropState.y=canvas.height*pad;
-  cropState.w=canvas.width*(1-pad*2); cropState.h=canvas.height*(1-pad*2);
-  overlay.classList.add('on');
-  syncCropBox();
-}
-
-function setCropRatio(ratio){
-  if(!cropState.active) startCrop();
-  cropState.ratio=ratio;
-  const ratios={'1:1':1,'4:5':4/5,'16:9':16/9};
-  if(ratio==='free') return syncCropBox();
-  const target=ratios[ratio];
-  let w=cropState.w,h=w/target;
-  if(h>canvas.height){h=cropState.h;w=h*target}
-  cropState.w=clamp(w,20,canvas.width);
-  cropState.h=clamp(h,20,canvas.height);
-  cropState.x=clamp((canvas.width-cropState.w)/2,0,canvas.width-cropState.w);
-  cropState.y=clamp((canvas.height-cropState.h)/2,0,canvas.height-cropState.h);
-  syncCropBox();
-}
-
-function syncCropBox(){
-  const box=document.getElementById('cropBox'), r=canvas.getBoundingClientRect();
-  const sx=r.width/canvas.width,sy=r.height/canvas.height;
-  box.style.left=(cropState.x*sx)+'px';
-  box.style.top=(cropState.y*sy)+'px';
-  box.style.width=(cropState.w*sx)+'px';
-  box.style.height=(cropState.h*sy)+'px';
-}
-
-function cancelCrop(){
-  cropState.active=false;
-  document.getElementById('cropOverlay').classList.remove('on');
-}
-
-function applyCrop(){
-  if(!cropState.active || !projectLoaded) return;
-  const sx=Math.round(cropState.x),sy=Math.round(cropState.y);
-  const sw=Math.round(cropState.w),sh=Math.round(cropState.h);
-  if(sw<10||sh<10) return toast('Crop area is too small');
-
-  const temp=document.createElement('canvas');
-  temp.width=sw; temp.height=sh;
-  const t=temp.getContext('2d');
-  t.drawImage(canvas,sx,sy,sw,sh,0,0,sw,sh);
-
-  const data=temp.toDataURL('image/png');
-  image=new Image();
-  image.onload=()=>{
-    originalSrc=data;
-    rotation=0; flipX=1; flipY=1;
-    render();
-    commit();
-    cancelCrop();
-    toast('Crop applied');
-  };
-  image.src=data;
-}
-
-function initCropHandles(){
-  document.querySelectorAll('.cropHandle').forEach(h=>{
-    h.addEventListener('pointerdown',e=>{
-      if(!cropState.active)return;
-      e.preventDefault(); e.stopPropagation();
-      const r=canvas.getBoundingClientRect();
-      cropDrag={corner:h.dataset.corner,startX:e.clientX,startY:e.clientY,
-        x:cropState.x,y:cropState.y,w:cropState.w,h:cropState.h,
-        sx:r.width/canvas.width,sy:r.height/canvas.height};
-      h.setPointerCapture?.(e.pointerId);
-    });
-  });
-}
-document.addEventListener('pointermove',e=>{
-  if(!cropDrag)return;
-  const dx=(e.clientX-cropDrag.startX)/cropDrag.sx;
-  const dy=(e.clientY-cropDrag.startY)/cropDrag.sy;
-  let {x,y,w,h}=cropDrag, c=cropDrag.corner;
-  const min=30;
-  if(c.includes('l')){x=clamp(cropDrag.x+dx,0,cropDrag.x+cropDrag.w-min);w=cropDrag.w-(x-cropDrag.x)}
-  if(c.includes('r')){w=clamp(cropDrag.w+dx,min,canvas.width-cropDrag.x)}
-  if(c.includes('t')){y=clamp(cropDrag.y+dy,0,cropDrag.y+cropDrag.h-min);h=cropDrag.h-(y-cropDrag.y)}
-  if(c.includes('b')){h=clamp(cropDrag.h+dy,min,canvas.height-cropDrag.y)}
-  const ratios={'1:1':1,'4:5':4/5,'16:9':16/9};
-  if(cropState.ratio!=='free'){
-    const ratio=ratios[cropState.ratio];
-    if(Math.abs(dx)>=Math.abs(dy)) h=w/ratio; else w=h*ratio;
-    if(c.includes('l'))x=cropDrag.x+cropDrag.w-w;
-    if(c.includes('t'))y=cropDrag.y+cropDrag.h-h;
-    x=clamp(x,0,canvas.width-w);y=clamp(y,0,canvas.height-h);
-  }
-  cropState.x=x;cropState.y=y;cropState.w=w;cropState.h=h;syncCropBox();
-});
-document.addEventListener('pointerup',()=>{cropDrag=null});
-
-function openTool(name,button){
-  if(name==='crop'){
-    document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active'));
-    if(button)button.classList.add('active');
-    startCrop();
-    return;
-  }
-  toolNames.forEach(n=>document.getElementById('tool-'+n)?.remove());
-  document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active'));
-  if(button)button.classList.add('active');
-  const el=document.createElement('div');el.id='tool-'+name;panel.appendChild(el);
-  renderTool(name,el);
-}
-
-// Better transform behavior for object layers.
-function objectBounds(o){
-  const size=(o.size||80)*(o.scale||1);
-  return {w:Math.max(40,size*(o.type==='text'?String(o.text||'').length*.55:1)),h:size*1.25};
-}
-
-function updateSelection(){
-  const o=objects.find(x=>x.id===selectedId);
-  if(!o){selection.style.display='none';return}
-  const r=canvas.getBoundingClientRect(), cr=wrap.getBoundingClientRect();
-  const b=objectBounds(o);
-  selection.style.display='block';
-  selection.style.width=b.w*(r.width/canvas.width)+'px';
-  selection.style.height=b.h*(r.height/canvas.height)+'px';
-  selection.style.left=(o.x/canvas.width*r.width-b.w/2*(r.width/canvas.width))+'px';
-  selection.style.top=(o.y/canvas.height*r.height-b.h/2*(r.height/canvas.height))+'px';
-  selection.style.transform=`rotate(${o.rotation||0}deg)`;
-}
-
-// Keyboard shortcuts commonly expected in professional editors.
-document.addEventListener('keydown',e=>{
-  if(e.target.matches('input,textarea,select'))return;
-  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo()}
-  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}
-  if(e.key.toLowerCase()==='c') startCrop();
-  if(e.key==='Escape'&&cropState.active) cancelCrop();
-});
-initCropHandles();
-
-
-// ===== Ava Pro v3: Professional Layer Transform Engine =====
-let transformGesture=null;
-
-function selectedObject(){
-  return objects.find(o=>o.id===selectedId && selectedId!=='photo');
-}
-
-function ensureObjectDefaults(o){
-  if(!o)return;
-  if(o.scale==null)o.scale=1;
-  if(o.rotation==null)o.rotation=0;
-  if(o.opacity==null)o.opacity=1;
-  if(o.visible==null)o.visible=true;
-  if(o.locked==null)o.locked=false;
-  if(!o.blend)o.blend='source-over';
-}
-
-function selectedTransformBox(){
-  const o=selectedObject();
-  const overlay=document.getElementById('transformOverlay');
-  const box=document.getElementById('transformBox');
-  if(!o || !o.visible){
-    overlay.classList.remove('on');
-    return;
-  }
-  ensureObjectDefaults(o);
-  const r=canvas.getBoundingClientRect();
-  const b=objectBounds(o);
-  const sx=r.width/canvas.width, sy=r.height/canvas.height;
-  overlay.classList.add('on');
-  box.style.left=(o.x*sx-b.w*sx/2)+'px';
-  box.style.top=(o.y*sy-b.h*sy/2)+'px';
-  box.style.width=(b.w*sx)+'px';
-  box.style.height=(b.h*sy)+'px';
-  box.style.transform=`rotate(${o.rotation||0}deg)`;
-  const op=document.getElementById('layerOpacity');
-  if(op){op.value=Math.round((o.opacity??1)*100);const v=document.getElementById('layerOpacityVal');if(v)v.textContent=Math.round((o.opacity??1)*100)}
-  const bm=document.getElementById('blendMode');if(bm)bm.value=o.blend||'source-over';
-}
-
-function updateSelection(){
-  const o=objects.find(x=>x.id===selectedId);
-  if(!o){
-    selection.style.display='none';
-    document.getElementById('transformOverlay')?.classList.remove('on');
-    return;
-  }
-  selection.style.display='none';
-  selectedTransformBox();
-}
-
-function selectLayer(id){
-  selectedId=id;
-  refreshLayers();
-  updateSelection();
-}
-
-function transformDuplicate(){duplicateSelected();selectedTransformBox()}
-function transformDelete(){deleteSelected()}
-function transformRotateBy(d){
-  const o=selectedObject();if(!o||o.locked)return;
-  o.rotation=(o.rotation+d)%360;render();commit();selectedTransformBox();refreshLayers();
-}
-function transformFlipX(){
-  const o=selectedObject();if(!o||o.locked)return;
-  o.flipX=-(o.flipX||1);render();commit();selectedTransformBox();
-}
-function transformReset(){
-  const o=selectedObject();if(!o||o.locked)return;
-  o.scale=1;o.rotation=0;o.flipX=1;o.flipY=1;
-  render();commit();selectedTransformBox();
-}
-
-function toggleSelectedVisibility(){
-  const o=selectedObject();if(!o)return;
-  o.visible=o.visible===false;
-  render();commit();refreshLayers();selectedTransformBox();
-}
-function toggleSelectedLock(){
-  const o=selectedObject();if(!o)return;
-  o.locked=!o.locked;commit();refreshLayers();selectedTransformBox();
-}
-function setSelectedBlend(v){
-  const o=selectedObject();if(!o)return;
-  o.blend=v;render();commit();
-}
-function bindLayerOpacity(){
-  const x=document.getElementById('layerOpacity');if(!x)return;
-  const o=selectedObject();x.value=Math.round((o?.opacity??1)*100);
-  x.oninput=()=>{const q=selectedObject();if(q&&!q.locked){q.opacity=Number(x.value)/100;const v=document.getElementById('layerOpacityVal');if(v)v.textContent=x.value;render();selectedTransformBox()}};
-  x.onchange=commit;
-}
-
-function initTransformHandles(){
-  document.querySelectorAll('#transformBox .th').forEach(h=>{
-    h.addEventListener('pointerdown',e=>{
-      const o=selectedObject();if(!o||o.locked)return;
-      e.preventDefault();e.stopPropagation();
-      const r=canvas.getBoundingClientRect(), b=objectBounds(o);
-      transformGesture={
-        type:'scale',handle:h.dataset.handle,id:o.id,
-        startX:e.clientX,startY:e.clientY,startScale:o.scale||1,
-        startW:b.w,startH:b.h,sx:r.width/canvas.width,sy:r.height/canvas.height
-      };
-      h.setPointerCapture?.(e.pointerId);
-    });
-  });
-
-  const rot=document.getElementById('transformRotate');
-  rot?.addEventListener('pointerdown',e=>{
-    const o=selectedObject();if(!o||o.locked)return;
-    e.preventDefault();e.stopPropagation();
-    const r=canvas.getBoundingClientRect(),px=r.left+o.x*(r.width/canvas.width),py=r.top+o.y*(r.height/canvas.height);
-    transformGesture={type:'rotate',id:o.id,cx:px,cy:py};
-    rot.setPointerCapture?.(e.pointerId);
-  });
-}
-
-document.addEventListener('pointermove',e=>{
-  if(!transformGesture)return;
-  const o=objects.find(x=>x.id===transformGesture.id);if(!o)return;
-  if(transformGesture.type==='scale'){
-    const dx=(e.clientX-transformGesture.startX)/transformGesture.sx;
-    const dy=(e.clientY-transformGesture.startY)/transformGesture.sy;
-    const dist=Math.max(10,Math.hypot(dx,dy));
-    const start=Math.max(10,Math.hypot(transformGesture.startW/2,transformGesture.startH/2));
-    let scale=transformGesture.startScale*(dist/start);
-    o.scale=clamp(scale,.05,20);
-  }else if(transformGesture.type==='rotate'){
-    const angle=Math.atan2(e.clientY-transformGesture.cy,e.clientX-transformGesture.cx)*180/Math.PI;
-    o.rotation=angle+90;
-  }
-  render();selectedTransformBox();
-});
-
-document.addEventListener('pointerup',()=>{
-  if(transformGesture){transformGesture=null;commit();refreshLayers()}
-});
-
-// Replace object rendering so hidden/locked/blended/flipped layers behave correctly.
-function drawObjects(){
-  objects.forEach(o=>{
-    ensureObjectDefaults(o);
-    if(o.visible===false)return;
-    ctx.save();
-    ctx.globalAlpha=o.opacity??1;
-    ctx.globalCompositeOperation=o.blend||'source-over';
-    ctx.translate(o.x,o.y);
-    ctx.rotate((o.rotation||0)*Math.PI/180);
-    ctx.scale((o.scale||1)*(o.flipX||1),(o.scale||1)*(o.flipY||1));
-    if(o.type==='text'){
-      ctx.font=`700 ${o.size}px ${o.font}`;
-      ctx.textAlign='center';ctx.textBaseline='middle';
-      if(o.style==='outline'){
-        ctx.lineWidth=Math.max(2,o.size/18);ctx.strokeStyle=o.color;ctx.strokeText(o.text,0,0);
-      }else{
-        if(o.style==='label'){
-          const m=ctx.measureText(o.text);ctx.fillStyle=o.bg+'dd';
-          ctx.fillRect(-m.width/2-o.size*.18,-o.size*.65,m.width+o.size*.36,o.size*1.25);
-        }
-        ctx.fillStyle=o.color;
-        if(o.style==='glow'){ctx.shadowColor=o.color;ctx.shadowBlur=o.size*.28}
-        ctx.fillText(o.text,0,0);
-      }
-    }else{
-      ctx.font=`${o.size}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.shadowColor='rgba(0,0,0,.25)';ctx.shadowBlur=5;ctx.fillStyle=o.color||'#fff';
-      ctx.fillText(o.text,0,0);
-    }
-    ctx.restore();
-  });
-}
-
-// Make layer creation compatible with the new transform engine.
-const _addText = addText;
-addText = function(style='fill'){
-  _addText(style);
-  const o=selectedObject();if(o)ensureObjectDefaults(o);
-  selectedTransformBox();refreshLayers();
-};
-const _addSticker = addSticker;
-addSticker = function(text){
-  _addSticker(text);
-  const o=selectedObject();if(o)ensureObjectDefaults(o);
-  selectedTransformBox();refreshLayers();
-};
-
-// Patch layer list so lock/visibility are visible.
-const _refreshLayers = refreshLayers;
-refreshLayers = function(){
-  const box=document.getElementById('layers');
-  if(!box)return;
-  box.innerHTML=`<div class="layer ${selectedId==='photo'?'sel':''}" onclick="selectLayer('photo')"><div class="thumb">🖼️</div><div class="name">Photo</div></div>`+
-    objects.slice().reverse().map(o=>{
-      ensureObjectDefaults(o);
-      return `<div class="layer ${selectedId===o.id?'sel':''}" onclick="selectLayer('${o.id}')"><div class="thumb">${o.type==='text'?'🔤':'😊'}</div><div class="name">${esc(o.text||o.type)} ${o.locked?'🔒':''} ${o.visible===false?'◌':''}</div><button onclick="event.stopPropagation();deleteLayer('${o.id}')">🗑️</button></div>`;
-    }).join('');
-  bindLayerOpacity();
-  selectedTransformBox();
-};
-
-// Make moving respect lock and provide transform handles after selection.
-const _selectLayer = selectLayer;
-selectLayer = function(id){
-  selectedId=id;refreshLayers();updateSelection();
-};
-
-// Enhance pointer selection/movement with lock support.
-canvas.addEventListener('pointerdown',e=>{
-  if(drawing||cropState?.active)return;
-  const p=point(e);let hit=null;
-  for(let i=objects.length-1;i>=0;i--){
-    const o=objects[i];ensureObjectDefaults(o);
-    if(o.visible===false)continue;
-    const b=objectBounds(o);
-    if(Math.abs(p.x-o.x)<b.w/2 && Math.abs(p.y-o.y)<b.h/2){hit=o;break}
-  }
-  if(hit){
-    selectedId=hit.id;refreshLayers();
-    if(hit.locked){toast('Layer is locked');return}
-    drag={id:hit.id,dx:p.x-hit.x,dy:p.y};
-    canvas.setPointerCapture?.(e.pointerId);updateSelection();
-  }
-});
-
-initTransformHandles();
-
-
-// ===== Ava Pro v4 — Professional Color Studio =====
-const hslChannels=['red','orange','yellow','green','cyan','blue','purple','magenta'];
-const hslNames={red:'Red',orange:'Orange',yellow:'Yellow',green:'Green',cyan:'Cyan',blue:'Blue',purple:'Purple',magenta:'Magenta'};
-
-let colorState={
-  hsl:Object.fromEntries(hslChannels.map(k=>[k,{h:0,s:0,l:0}])),
-  curves:{master:[[0,0],[1,1]]},
-  grading:{
-    shadows:'#000000',midtones:'#000000',highlights:'#000000',
-    shadowAmount:0,midAmount:0,highlightAmount:0
-  }
-};
-
-function resetColorStudio(){
-  hslChannels.forEach(k=>colorState.hsl[k]={h:0,s:0,l:0});
-  colorState.curves={master:[[0,0],[1,1]]};
-  colorState.grading={shadows:'#000000',midtones:'#000000',highlights:'#000000',shadowAmount:0,midAmount:0,highlightAmount:0};
-  render();commit();openTool('color');toast('Color Studio reset');
-}
-
-function colorRange(id,label,min,max,val,oninput,onchange){
-  return `<div class="row"><div class="label">${label}<span id="${id}Val">${val}</span></div><input id="${id}" class="miniRange" type="range" min="${min}" max="${max}" value="${val}" step="1"></div>`;
-}
-
-function renderProfessionalColor(el){
-  let hslHtml=hslChannels.map(k=>{
-    const c=colorState.hsl[k];
-    return `<div class="hslItem"><div class="hslName"><span>${hslNames[k]}</span><span id="hsl_${k}_summary">H ${c.h} · S ${c.s} · L ${c.l}</span></div>
-      <div class="smallValue">Hue</div><input id="hsl_${k}_h" class="miniRange" type="range" min="-100" max="100" value="${c.h}">
-      <div class="smallValue">Saturation</div><input id="hsl_${k}_s" class="miniRange" type="range" min="-100" max="100" value="${c.s}">
-      <div class="smallValue">Luminance</div><input id="hsl_${k}_l" class="miniRange" type="range" min="-100" max="100" value="${c.l}">
-    </div>`;
-  }).join('');
-
-  el.innerHTML=section('Color Studio',`
-    <div class="colorCard">
-      <h4>Global Color</h4>
-      ${slider('saturation','Saturation',-100,100,base.saturation)}
-      ${slider('vibrance','Vibrance',-100,100,base.vibrance)}
-      ${slider('temperature','Temperature',-100,100,base.temperature)}
-      ${slider('tint','Tint',-100,100,base.tint)}
-      ${slider('exposure','Exposure',-100,100,base.exposure)}
-    </div>
-
-    <div class="colorCard">
-      <h4>HSL / Color Mix</h4>
-      <div class="hslGrid">${hslHtml}</div>
-    </div>
-
-    <div class="colorCard">
-      <h4>RGB Tone Curve</h4>
-      <div class="curveBox" id="curveBox">
-        <div class="curveGrid"></div>
-        <canvas id="curveCanvas" width="500" height="190"></canvas>
-      </div>
-      <div class="grid2" style="margin-top:7px">
-        <button class="btn" onclick="curveAddPoint()">＋ Add Point</button>
-        <button class="btn" onclick="curveReset()">Reset Curve</button>
-      </div>
-    </div>
-
-    <div class="colorCard">
-      <h4>Color Grading</h4>
-      <div class="gradeWheel">
-        <button><span>Shadows</span><input id="gradeShadowColor" type="color" value="${colorState.grading.shadows}"></button>
-        <button><span>Midtones</span><input id="gradeMidColor" type="color" value="${colorState.grading.midtones}"></button>
-        <button><span>Highlights</span><input id="gradeHighColor" type="color" value="${colorState.grading.highlights}"></button>
-      </div>
-      ${slider('gradeShadowAmount','Shadows Amount',0,100,colorState.grading.shadowAmount)}
-      ${slider('gradeMidAmount','Midtones Amount',0,100,colorState.grading.midAmount)}
-      ${slider('gradeHighAmount','Highlights Amount',0,100,colorState.grading.highlightAmount)}
-    </div>
-
-    <div class="grid2">
-      <button class="btn" onclick="autoColorGrade()">✨ Auto Color</button>
-      <button class="btn" onclick="resetColorStudio()">Reset All Color</button>
-    </div>
-  `);
-
-  ['saturation','vibrance','temperature','tint','exposure'].forEach(k=>bindSlider(k,k));
-
-  hslChannels.forEach(k=>{
-    ['h','s','l'].forEach(t=>{
-      const x=document.getElementById(`hsl_${k}_${t}`);
-      if(!x)return;
-      x.oninput=()=>{
-        colorState.hsl[k][t]=Number(x.value);
-        document.getElementById(`hsl_${k}_summary`).textContent=`H ${colorState.hsl[k].h} · S ${colorState.hsl[k].s} · L ${colorState.hsl[k].l}`;
-        render();
-      };
-      x.onchange=commit;
-    });
-  });
-
-  ['gradeShadowColor','gradeMidColor','gradeHighColor'].forEach((id,i)=>{
-    const x=document.getElementById(id); if(!x)return;
-    x.oninput=()=>{
-      if(i===0)colorState.grading.shadows=x.value;
-      if(i===1)colorState.grading.midtones=x.value;
-      if(i===2)colorState.grading.highlights=x.value;
-      render();
-    };
-    x.onchange=commit;
-  });
-
-  ['gradeShadowAmount','gradeMidAmount','gradeHighAmount'].forEach((id,i)=>{
-    const x=document.getElementById(id);if(!x)return;
-    x.oninput=()=>{
-      const v=Number(x.value);
-      if(i===0)colorState.grading.shadowAmount=v;
-      if(i===1)colorState.grading.midAmount=v;
-      if(i===2)colorState.grading.highlightAmount=v;
-      document.getElementById(id+'Val').textContent=v;
-      render();
-    };
-    x.onchange=commit;
-  });
-
-  initCurveEditor();
-}
-
-function autoColorGrade(){
-  base.brightness=6;base.contrast=8;base.saturation=8;base.vibrance=14;
-  base.shadows=7;base.highlights=-5;base.temperature=3;base.tint=0;
-  colorState.grading.shadowAmount=5;colorState.grading.highlightAmount=4;
-  render();commit();openTool('color');toast('Auto Color applied');
-}
-
-// Curve editor: master RGB tone curve, stored non-destructively.
-function curveReset(){
-  colorState.curves={master:[[0,0],[1,1]]};
-  initCurveEditor();render();commit();toast('Curve reset');
-}
-function curveSorted(){
-  const pts=colorState.curves.master||[[0,0],[1,1]];
-  return pts.slice().sort((a,b)=>a[0]-b[0]);
-}
-function curveAddPoint(){
-  const pts=curveSorted();
-  const x=.5;
-  let y=.5;
-  if(pts.length>1){
-    let a=pts[0],b=pts[pts.length-1];
-    for(let i=0;i<pts.length-1;i++)if(x>=pts[i][0]&&x<=pts[i+1][0]){a=pts[i];b=pts[i+1];break}
-    const t=(x-a[0])/Math.max(.0001,b[0]-a[0]);y=a[1]+(b[1]-a[1])*t;
-  }
-  if(!pts.some(p=>Math.abs(p[0]-x)<.03)){pts.push([x,y]);colorState.curves.master=pts;initCurveEditor();render();commit()}
-}
-function curveEvaluate(x){
-  const pts=curveSorted();
-  if(x<=pts[0][0])return pts[0][1];
-  for(let i=0;i<pts.length-1;i++){
-    const a=pts[i],b=pts[i+1];
-    if(x<=b[0]){
-      const t=(x-a[0])/Math.max(.0001,b[0]-a[0]);
-      return a[1]+(b[1]-a[1])*t;
-    }
-  }
-  return pts[pts.length-1][1];
-}
-function initCurveEditor(){
-  const c=document.getElementById('curveCanvas');if(!c)return;
-  const box=document.getElementById('curveBox');
-  const cc=c.getContext('2d');
-  function drawCurve(){
-    cc.clearRect(0,0,c.width,c.height);
-    cc.strokeStyle='#9b8bff';cc.lineWidth=4;cc.beginPath();
-    for(let i=0;i<=100;i++){
-      const x=i/100,y=curveEvaluate(x);
-      const px=x*c.width,py=(1-y)*c.height;
-      if(i===0)cc.moveTo(px,py);else cc.lineTo(px,py);
-    }
-    cc.stroke();
-    cc.fillStyle='#fff';
-    curveSorted().forEach(p=>{cc.beginPath();cc.arc(p[0]*c.width,(1-p[1])*c.height,6,0,Math.PI*2);cc.fill()});
-  }
-  drawCurve();
-
-  let drag=null;
-  c.onpointerdown=e=>{
-    const r=c.getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,1),y=clamp(1-(e.clientY-r.top)/r.height,0,1);
-    const pts=curveSorted();
-    let hit=-1,best=.04;
-    pts.forEach((p,i)=>{const d=Math.hypot(p[0]-x,p[1]-y);if(d<best){best=d;hit=i}});
-    if(hit<0){pts.push([x,y]);colorState.curves.master=pts;hit=pts.length-1}
-    drag={index:hit};
-    c.setPointerCapture?.(e.pointerId);drawCurve();
-  };
-  c.onpointermove=e=>{
-    if(!drag)return;
-    const r=c.getBoundingClientRect();
-    const pts=colorState.curves.master;
-    let p=pts[drag.index];if(!p)return;
-    const x=clamp((e.clientX-r.left)/r.width,0,1),y=clamp(1-(e.clientY-r.top)/r.height,0,1);
-    // Keep endpoints anchored to make the curve predictable.
-    if(p[0]===0){p[0]=0;p[1]=y}
-    else if(p[0]===1){p[0]=1;p[1]=y}
-    else {p[0]=clamp(x,.01,.99);p[1]=y}
-    colorState.curves.master=pts;drawCurve();render();
-  };
-  c.onpointerup=()=>{if(drag){drag=null;commit()}};
-}
-
-// Approximate the tone curve using a compact per-pixel lookup table.
-// This is applied after canvas filter rendering without external libraries.
-function applyToneCurve(){
-  const pts=colorState.curves?.master;
-  if(!pts || pts.length<=2)return;
-  const lut=new Uint8ClampedArray(256);
-  for(let i=0;i<256;i++)lut[i]=Math.round(clamp(curveEvaluate(i/255),0,1)*255);
-  const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-  const d=img.data;
-  for(let i=0;i<d.length;i+=4){d[i]=lut[d[i]];d[i+1]=lut[d[i+1]];d[i+2]=lut[d[i+2]]}
-  ctx.putImageData(img,0,0);
-}
-
-// Color grading is represented as screen-like tints based on luminance bands.
-function hexRgb(hex){
-  const n=parseInt(hex.replace('#',''),16);
-  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
-}
-function applyColorGrade(){
-  const g=colorState.grading;if(!g)return;
-  const amounts=[g.shadowAmount,g.midAmount,g.highlightAmount];
-  if(!amounts.some(Boolean))return;
-  const img=ctx.getImageData(0,0,canvas.width,canvas.height),d=img.data;
-  const sh=hexRgb(g.shadows),mi=hexRgb(g.midtones),hi=hexRgb(g.highlights);
-  for(let i=0;i<d.length;i+=4){
-    const lum=(.2126*d[i]+.7152*d[i+1]+.0722*d[i+2])/255;
-    let col,amt;
-    if(lum<.33){col=sh;amt=g.shadowAmount/100}
-    else if(lum<.66){col=mi;amt=g.midAmount/100}
-    else{col=hi;amt=g.highlightAmount/100}
-    d[i]=clamp(d[i]*(1-amt)+col.r*amt,0,255);
-    d[i+1]=clamp(d[i+1]*(1-amt)+col.g*amt,0,255);
-    d[i+2]=clamp(d[i+2]*(1-amt)+col.b*amt,0,255);
-  }
-  ctx.putImageData(img,0,0);
-}
-
-// Replace render with a v4 render pipeline while preserving existing UI behavior.
-const renderV3=render;
-render=function(){
-  renderV3();
-  if(!projectLoaded||compareOriginal)return;
-  applyToneCurve();
-  applyColorGrade();
-  updateSelection();
-};
-
-// Replace Color tool renderer with the professional studio.
-const renderToolV3=renderTool;
-renderTool=function(name,el){
-  if(name==='color'){renderProfessionalColor(el);return}
-  renderToolV3(name,el);
-};
-
-function snapshot(){
-  return JSON.stringify({
-    base,filter,rotation,flipX,flipY,frame,
-    colorState,
-    objects:objects.map(o=>({...o,visible:o.visible!==false,locked:!!o.locked,opacity:o.opacity??1,blend:o.blend||'source-over',flipX:o.flipX||1,flipY:o.flipY||1}))
-  });
-}
-
-function restore(s){
-  const p=JSON.parse(s);
-  base=p.base;filter=p.filter;rotation=p.rotation;flipX=p.flipX;flipY=p.flipY;frame=p.frame;
-  if(p.colorState)colorState=p.colorState;
-  objects=p.objects||[];selectedId=null;render();refreshLayers();
-}
-
-// Ensure reset starts with clean color controls.
-const resetProjectV3=resetProject;
-resetProject=function(){
-  resetProjectV3();
-  colorState={
-    hsl:Object.fromEntries(hslChannels.map(k=>[k,{h:0,s:0,l:0}])),
-    curves:{master:[[0,0],[1,1]]},
-    grading:{shadows:'#000000',midtones:'#000000',highlights:'#000000',shadowAmount:0,midAmount:0,highlightAmount:0}
-  };
-  render();
-};
-
-// HSL is exposed as a real non-destructive state. Browser canvas filter handles
-// global color controls; per-channel HSL values are retained for the next GPU shader stage.
-function hslStateActive(){
-  return hslChannels.some(k=>Object.values(colorState.hsl[k]).some(v=>v!==0));
-}
-
-openTool('adjust');toast('Photo loaded')};image.src=ev.target.result}else if(mode==='sticker'){addSticker('🖼️');toast('Custom sticker placeholder added — connect background removal API for automatic cutout')}else{toast('Overlay image loaded — blend layer can be connected to the project engine')}};reader.readAsDataURL(f) }); document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key.toLowerCase()==='z'){e.preventDefault();undo()}if(e.ctrlKey&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}if(e.key==='Delete')deleteSelected()}); openTool('adjust'); </script>
-
-</body> </html>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'); 
+const empty=document.getElementById('empty'),stage=document.getElementById('stage'),wrap=document.getElementById('canvasWrap'); 
+const selection=document.getElementById('selection'),fileInput=document.getElementById('fileInput'),panel=document.getElementById('panel'); 
+const workspace=document.getElementById('workspace'); 
+let image=new Image(), originalSrc='', projectLoaded=false, selectedId=null, compareOriginal=false; 
+let base={brightness:0,contrast:0,saturation:0,exposure:0,temperature:0,t
